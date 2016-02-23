@@ -6,8 +6,8 @@ require_relative 'world'
 class Character
   attr_accessor :name, :hp, :xp, :attack, :defence, :level, :state, :location
 
-  # Create the character
-  def initialize(name, initial_level)
+  # Create the character, which by default begins at level one
+  def initialize(name, initial_level=1)
     @name = name
     @hp = rand(80..100) + rand(10..20) * initial_level
     @xp = 0
@@ -60,8 +60,9 @@ def get_enemy_choice(defence, attack)
 end
 
 def fill_name_array(names)
-  f = File.open("names") or die "Unable to open names file."
+  f = File.open("names") or die "Unable to open 'names' file."
   f.each_line {|name|names.push name}
+  f.close
 end
 
 def player_action(protagonist, antagonist, choice)
@@ -93,47 +94,27 @@ def enemy_action(protagonist, antagonist, choice)
   end
 end
 
-def handle_input(input)
-  case input.downcase
-  when "n"
-    new_location = $world.get_destination($player.location, 0)
-  when "e"
-    new_location = $world.get_destination($player.location, 1)
-  when "s"
-    new_location = $world.get_destination($player.location, 2)
-  when "w"
-    new_location = $world.get_destination($player.location, 3)
-  when "u"
-    new_location = $world.get_destination($player.location, 4)
-  when "d"
-    new_location = $world.get_destination($player.location, 5)
-  end
-
-  unless new_location.nil?
-    puts
-    $player.location = new_location
-  else
-    puts "\nYou can't go that way!".colorize(:green)
-  end
+def handle_input
+	expected = {n: 0, e: 1, s: 2, w: 3, u: 4, d: 5}
+  	new_location = $world.get_destination($player.location, expected.fetch(gets.chomp.first.downcase.to_sym) {puts "\nYou can't go that way!".colorize(:green)})
+    	$player.location = new_location
 end
 
 if __FILE__ == $0
-  names = %w(Mike Joe Alice Susan)
-  fill_name_array(names)
+  fill_name_array %w(Mike Joe Alice Susan)
 
-  $world = World.new("30.wld")
+  $world = World.new "30.wld"
 
   print "Welcome! What is your name? ".colorize(:green)
 
-  $player = Character.new(gets.chomp, 1) # player starts at level 1
+  $player = Character.new gets.chomp
   puts
 
-  while true
+  loop do # starts an infinite loop
     puts $world.get_room_name($player.location).colorize(:light_blue)
     puts $world.get_room_description($player.location).colorize(:green)
-    puts
-    print "\n>".colorize(:green)
+    print "\n\n> ".colorize(:green)
 
-    handle_input(gets.chomp)
+    handle_input
   end
 end
