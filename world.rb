@@ -50,15 +50,15 @@ class World
   end
 
   def get_room_name(room_number)
-    return @rooms[room_number].name
+    return @rooms.key?(room_number) ? @rooms[room_number].name : nil
   end
 
   def get_room_description(room_number)
-    return @rooms[room_number].description
+    return @rooms.key?(room_number) ? @rooms[room_number].description : nil
   end
 
   def get_destination(room_number, direction)
-    return @rooms[room_number].direction_data[direction]
+    return @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
   end
 
 end
