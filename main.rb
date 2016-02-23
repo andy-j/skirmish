@@ -48,7 +48,7 @@ def get_player_choice
   case gets.chomp.first
     when "A" then return "attack"
     when "D" then return "defend"
-   when "F" then return "flee"
+    when "F" then return "flee"
   else
     puts "I'm sorry, that's not an option."
     return get_player_choice
@@ -112,13 +112,8 @@ def handle_input(input)
   unless new_location.nil?
     puts
     $player.location = new_location
-<<<<<<< HEAD
   else
-    puts
-    puts "You can't go that way!".colorize(:green)
-=======
-  else puts "\nYou can't go that way!"
->>>>>>> 843351038ae0ac81b0f103d5dfd8f4d18713d4aa
+    puts "\nYou can't go that way!".colorize(:green)
   end
 end
 
