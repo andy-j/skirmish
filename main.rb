@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'colorize'
 require_relative 'world'
 
 class Character
@@ -122,7 +123,7 @@ def handle_input(input)
     $player.location = new_location
   else
     puts
-    puts "You can't go that way!"
+    puts "You can't go that way!".colorize(:green)
   end
 end
 
@@ -132,15 +133,16 @@ if __FILE__ == $0
 
   $world = World.new("30.wld")
 
-  print "Welcome! What is your name? "
+  print "Welcome! What is your name? ".colorize(:green)
 
   $player = Character.new(gets.chomp, 1) # player starts at level 1
+  puts
 
   while true
-    puts $world.get_room_name($player.location)
-    puts $world.get_room_description($player.location)
+    puts $world.get_room_name($player.location).colorize(:light_blue)
+    puts $world.get_room_description($player.location).colorize(:green)
     puts
-    print ">"
+    print ">".colorize(:green)
     handle_input(gets.chomp)
   end
 end
