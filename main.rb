@@ -94,7 +94,7 @@ def enemy_action(protagonist, antagonist, choice)
 end
 
 def handle_input(input)
-  case input.downcase.first
+  case input.downcase
   when "n"
     new_location = $world.get_destination($player.location, 0)
   when "e"
