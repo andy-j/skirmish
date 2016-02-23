@@ -1,12 +1,9 @@
 #!/usr/bin/env ruby
 
+require_relative 'world'
+
 class Character
-  attr_accessor :name
-  attr_accessor :hp
-  attr_accessor :xp
-  attr_accessor :attack
-  attr_accessor :defence
-  attr_accessor :level
+  attr_accessor :name, :hp, :xp, :attack, :defence, :level, :state, :location
 
   # Create the chatacter
   def initialize(name, initial_level)
@@ -16,6 +13,7 @@ class Character
     @attack = rand(80..100) + rand(10..20) * initial_level
     @defence = rand(80..100) + rand(10..20) * initial_level
     @level = initial_level
+    @location = 3001
   end
 
   # Add experience. If we've gained 400xp since our last level, level up!
@@ -98,9 +96,33 @@ def enemy_action(protagonist, antagonist, choice)
     return "#{protagonist.name}'s attack did #{damage} damage!"
   when "defend"
     restore = protagonist.defence * rand(1..2) / 15
-    puts "ENEMY RESTORE: #{restore}"
     protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
     return "#{protagonist.name} restored #{restore} hitpoints!"
+  end
+end
+
+def handle_input(input)
+  case input.downcase
+  when "n"
+    new_location = $world.get_destination($player.location, 0)
+  when "e"
+    new_location = $world.get_destination($player.location, 1)
+  when "s"
+    new_location = $world.get_destination($player.location, 2)
+  when "w"
+    new_location = $world.get_destination($player.location, 3)
+  when "u"
+    new_location = $world.get_destination($player.location, 4)
+  when "d"
+    new_location = $world.get_destination($player.location, 5)
+  end
+
+  if new_location != nil
+    puts
+    $player.location = new_location
+  else
+    puts
+    puts "You can't go that way!"
   end
 end
 
@@ -108,38 +130,17 @@ if __FILE__ == $0
   names = ["Mike", "Joe", "Alice", "Susan"]
   fill_name_array(names)
 
-  print "Welcome to the dungeon. What is your name? "
+  $world = World.new("30.wld")
 
-  player = Character.new(gets.chomp, 1) # player starts at level 1
-  enemy = Character.new(names.sample.chomp.capitalize, 1) # start with a level 1 enemy
+  print "Welcome! What is your name? "
 
-  puts
-  puts "A terrifying monster that goes by the name of #{enemy.name} stands before you!"
+  $player = Character.new(gets.chomp, 1) # player starts at level 1
 
-  while player.hp > 0
+  while true
+    puts $world.get_room_name($player.location)
+    puts $world.get_room_description($player.location)
     puts
-    puts "#{player.name} HP: #{player.hp} | #{enemy.name} HP: #{enemy.hp}"
-
-    puts player_action(player, enemy, get_player_choice)
-    sleep 1.5
-
-    if enemy.hp <= 0
-      puts "You have defeated #{enemy.name}! Good riddance!"
-      player.add_xp(rand(100..200))
-      enemy = Character.new(names.sample.chomp.capitalize, player.level)
-      puts
-      puts "You take a moment to gather your breath."
-      sleep 1.5
-      puts "A terrifying monster that goes by the name of #{enemy.name} stands before you!"
-    else
-      choice = get_enemy_choice(enemy.defence, enemy.attack)
-      puts enemy_action(enemy, player, choice)
-      sleep 1.5
-    end
+    print ">"
+    handle_input(gets.chomp)
   end
-
-  puts
-  puts "You have died. #{enemy.name} laughs."
-  puts "Level reached: #{player.level}"
-
 end
