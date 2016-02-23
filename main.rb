@@ -5,7 +5,7 @@ require_relative 'world'
 class Character
   attr_accessor :name, :hp, :xp, :attack, :defence, :level, :state, :location
 
-  # Create the chatacter
+  # Create the character
   def initialize(name, initial_level)
     @name = name
     @hp = rand(80..100) + rand(10..20) * initial_level
@@ -22,7 +22,7 @@ class Character
 
     if @xp >= 400   # level up!
       puts "Congratulations, you have gained a level!"
-      @xp = @xp - 400
+      @xp =- 400
       @attack += rand(10..20)
       @defence += rand(10..20)
       @hp = @defence
@@ -31,45 +31,36 @@ class Character
   end
 
   def get_stats
-    puts
-    puts "Name:%12s" % name
+    puts "\nName:%12s" % name
     puts "Level:     %6d" % level
     puts "Experience:%6d" % xp
     puts "Hitpoints: %6d" % hp
     puts "Attack:    %6d" % attack
-    puts "Defence:   %6d" % defence
-    puts
+    puts "Defence:   %6d\n" % defence
   end
 
 end
 
 def get_player_choice
   print "(A)ttack, (D)efend, or (F)lee? "
-  input = gets.chomp
 
-  case input.upcase
-  when "A" then return "attack"
-  when "D" then return "defend"
-  when "F" then return "flee"
-  else puts "I'm sorry, that's not an option."
+  case gets.chomp.first
+    when "A" then return "attack"
+    when "D" then return "defend"
+   when "F" then return "flee"
+  else
+    puts "I'm sorry, that's not an option."
     return get_player_choice
   end
 end
 
 def get_enemy_choice(defence, attack)
-  roll = rand(defence + attack)
-  if roll < defence
-    return "defend"
-  else
-    return "attack"
-  end
+  (rand(defense + attack) < defence) ? "defend" : "attack"
 end
 
 def fill_name_array(names)
   f = File.open("names") or die "Unable to open names file."
-  f.each_line {|name|
-    names.push name
-  }
+  f.each_line {|name|names.push name}
 end
 
 def player_action(protagonist, antagonist, choice)
@@ -83,7 +74,7 @@ def player_action(protagonist, antagonist, choice)
     protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
     return "You restored #{restore} hitpoints!"
   when "flee"
-    puts "#{antagonist.name} laughs as you run away, like a coward."
+    puts "#{antagonist.name} laughs as you run away like a coward."
     exit
   end
 end
@@ -102,7 +93,7 @@ def enemy_action(protagonist, antagonist, choice)
 end
 
 def handle_input(input)
-  case input.downcase
+  case input.downcase.first
   when "n"
     new_location = $world.get_destination($player.location, 0)
   when "e"
@@ -117,17 +108,15 @@ def handle_input(input)
     new_location = $world.get_destination($player.location, 5)
   end
 
-  if new_location != nil
+  unless new_location.nil?
     puts
     $player.location = new_location
-  else
-    puts
-    puts "You can't go that way!"
+  else puts "\nYou can't go that way!"
   end
 end
 
 if __FILE__ == $0
-  names = ["Mike", "Joe", "Alice", "Susan"]
+  names = %w(Mike Joe Alice Susan)
   fill_name_array(names)
 
   $world = World.new("30.wld")
@@ -139,8 +128,7 @@ if __FILE__ == $0
   while true
     puts $world.get_room_name($player.location)
     puts $world.get_room_description($player.location)
-    puts
-    print ">"
+    print "\n>"
     handle_input(gets.chomp)
   end
 end
