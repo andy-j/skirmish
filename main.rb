@@ -45,10 +45,10 @@ end
 def get_player_choice
   print "(A)ttack, (D)efend, or (F)lee? "
 
-  case gets.chomp.first
-    when "A" then return "attack"
-    when "D" then return "defend"
-    when "F" then return "flee"
+  case gets.chomp
+    when /a/ then return "attack"
+    when /d/ then return "defend"
+    when /f/ then return "flee"
   else
     puts "I'm sorry, that's not an option."
     return get_player_choice
