@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+\#!/usr/bin/env ruby
 
 require 'colorize'
 require_relative 'world'
@@ -46,9 +46,9 @@ def get_player_choice
   print "(A)ttack, (D)efend, or (F)lee? "
 
   case gets.chomp
-    when /a/ then return "attack"
-    when /d/ then return "defend"
-    when /f/ then return "flee"
+    when /\Aa/i then return "attack"
+    when /\Ad/i then return "defend"
+    when /\Af/i then return "flee"
   else
     puts "I'm sorry, that's not an option."
     return get_player_choice
@@ -95,8 +95,19 @@ def enemy_action(protagonist, antagonist, choice)
 end
 
 def handle_input
-	expected = {n: 0, e: 1, s: 2, w: 3, u: 4, d: 5}
-  	new_location = $world.get_destination($player.location, expected.fetch(gets.chomp.first.downcase.to_sym) {puts "\nYou can't go that way!".colorize(:green)})
+  	new_location = $world.get_destination($player.location,
+		case gets.chomp
+			when /\An/i then 0
+			when /\Ae/i then 1
+			when /\As/i then 2
+			when /\Aw/i then 3
+			when /\Au/i then 4
+ 			when /\Ad/i then 5
+		else
+			puts "\nYou can't go that way!".colorize(:green)
+			return
+		end
+	)
     	$player.location = new_location
 end
 
