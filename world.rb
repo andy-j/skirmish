@@ -17,30 +17,25 @@ class World
 
       new_room.description = room.shift
       line = room.shift
-      while line != "~"
-        new_room.description.concat("\n")
-        new_room.description.concat(line)
+      until line == "~"
+        new_room.description.concat "\n"
+        new_room.description.concat line
         line = room.shift
       end
 
-      line = room.shift
-      line = room.shift
+      2.times {line = room.shift}
 
-      while line != "S"
+      until line == "S"
         if line[0] == "D"
           direction = line[1]
           dest = room.shift
-          while dest != "~"
-            dest = room.shift
-          end
+          dest = room.shift until dest == "~"
           room.shift
           dest = room.shift.split[-1]
           new_room.direction_data.store(direction.to_i, dest.to_i)
           line = room.shift
         else
-          while line != "~"
-            line = room.shift
-          end
+          line = room.shift until line == "~"
           line = room.shift
         end
       end
@@ -50,15 +45,15 @@ class World
   end
 
   def get_room_name(room_number)
-    return @rooms.key?(room_number) ? @rooms[room_number].name : nil
+    @rooms.key?(room_number) ? @rooms[room_number].name : nil
   end
 
   def get_room_description(room_number)
-    return @rooms.key?(room_number) ? @rooms[room_number].description : nil
+    @rooms.key?(room_number) ? @rooms[room_number].description : nil
   end
 
   def get_destination(room_number, direction)
-    return @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
+    @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
   end
 
 end
