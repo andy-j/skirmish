@@ -50,7 +50,7 @@ def get_player_choice
     when /\Ad/i then "defend"
     when /\Af/i then "flee"
   else
-    puts "I'm sorry, that's not an option."
+    puts "I'm sorry, that's not an option.\n"
     get_player_choice
   end
 end
@@ -105,7 +105,7 @@ def handle_input
  			when /\Ad/i then 5
 		else
 			puts "\nYou can't go that way!".colorize(:green)
-			return
+			return handle_input
 		end
 	)
     	$player.location = new_location
@@ -124,7 +124,7 @@ if __FILE__ == $0
   loop do # starts an infinite loop
     puts $world.get_room_name($player.location).colorize(:light_blue)
     puts $world.get_room_description($player.location).colorize(:green)
-    print "\n\n> ".colorize(:green)
+    print "\nWhich way do you want to go?\n> ".colorize(:green)
 
     handle_input
   end
