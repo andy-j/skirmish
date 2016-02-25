@@ -6,8 +6,8 @@ require_relative 'world'
 class Character
   attr_accessor :name, :hp, :xp, :attack, :defence, :level, :state, :location
 
-  # Create the character
-  def initialize(name, initial_level)
+  # Create the character, which by default begins at level one
+  def initialize(name, initial_level=1)
     @name = name
     @hp = rand(80..100) + rand(10..20) * initial_level
     @xp = 0
@@ -21,8 +21,8 @@ class Character
   def add_xp(gain)
     @xp += gain
 
-    if @xp >= 400   # level up!
-      puts "Congratulations, you have gained a level!"
+    while @xp >= 400   # level up!
+      puts "Congratulations, you have gained a level! You are now level #{@level}"
       @xp =- 400
       @attack += rand(10..20)
       @defence += rand(10..20)
@@ -45,13 +45,13 @@ end
 def get_player_choice
   print "(A)ttack, (D)efend, or (F)lee? "
 
-  case gets.chomp.first
-    when "A" then return "attack"
-    when "D" then return "defend"
-    when "F" then return "flee"
+  case gets.chomp
+    when /\Aa/i then "attack"
+    when /\Ad/i then "defend"
+    when /\Af/i then "flee"
   else
-    puts "I'm sorry, that's not an option."
-    return get_player_choice
+    puts "I'm sorry, that's not an option.\n"
+    get_player_choice
   end
 end
 
@@ -60,23 +60,24 @@ def get_enemy_choice(defence, attack)
 end
 
 def fill_name_array(names)
-  f = File.open("names") or die "Unable to open names file."
+  f = File.open("names") or die "Unable to open 'names' file."
   f.each_line {|name|names.push name}
+  f.close
 end
 
 def player_action(protagonist, antagonist, choice)
   case choice
-  when "attack"
-    damage = protagonist.attack * rand(1..3) / 10
-    antagonist.hp -= damage
-    return "Your attack did #{damage} damage to #{antagonist.name}!"
-  when "defend"
-    restore = protagonist.defence * rand(1..2) / 15
-    protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    return "You restored #{restore} hitpoints!"
-  when "flee"
-    puts "#{antagonist.name} laughs as you run away like a coward."
-    exit
+  	when "attack"
+    		damage = protagonist.attack * rand(1..3) / 10
+    		antagonist.hp -= damage
+    		"Your attack did #{damage} damage to #{antagonist.name}!"
+  	when "defend"
+    		restore = protagonist.defence * rand(1..2) / 15
+    		protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
+    		"You restored #{restore} hitpoints!"
+  	when "flee"
+    		puts "#{antagonist.name} laughs as you run away like a coward."
+    		exit
   end
 end
 
@@ -85,55 +86,46 @@ def enemy_action(protagonist, antagonist, choice)
   when "attack"
     damage = protagonist.attack * rand(1..3) / 10
     antagonist.hp -= damage
-    return "#{protagonist.name}'s attack did #{damage} damage!"
+    "#{protagonist.name}'s attack did #{damage} damage!"
   when "defend"
     restore = protagonist.defence * rand(1..2) / 15
     protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    return "#{protagonist.name} restored #{restore} hitpoints!"
+    "#{protagonist.name} restored #{restore} hitpoints!"
   end
 end
 
-def handle_input(input)
-  case input.downcase
-  when "n"
-    new_location = $world.get_destination($player.location, 0)
-  when "e"
-    new_location = $world.get_destination($player.location, 1)
-  when "s"
-    new_location = $world.get_destination($player.location, 2)
-  when "w"
-    new_location = $world.get_destination($player.location, 3)
-  when "u"
-    new_location = $world.get_destination($player.location, 4)
-  when "d"
-    new_location = $world.get_destination($player.location, 5)
-  end
-
-  unless new_location.nil?
-    puts
-    $player.location = new_location
-  else
-    puts "\nYou can't go that way!".colorize(:green)
-  end
+def handle_input
+  	new_location = $world.get_destination($player.location,
+		case gets.chomp
+			when /\An/i then 0
+			when /\Ae/i then 1
+			when /\As/i then 2
+			when /\Aw/i then 3
+			when /\Au/i then 4
+ 			when /\Ad/i then 5
+		else
+			puts "\nYou can't go that way!".colorize(:green)
+			return handle_input
+		end
+	)
+    	$player.location = new_location
 end
 
 if __FILE__ == $0
-  names = %w(Mike Joe Alice Susan)
-  fill_name_array(names)
+  fill_name_array %w(Mike Joe Alice Susan)
 
-  $world = World.new("30.wld")
+  $world = World.new "30.wld"
 
   print "Welcome! What is your name? ".colorize(:green)
 
-  $player = Character.new(gets.chomp, 1) # player starts at level 1
+  $player = Character.new gets.chomp
   puts
 
-  while true
+  loop do # starts an infinite loop
     puts $world.get_room_name($player.location).colorize(:light_blue)
     puts $world.get_room_description($player.location).colorize(:green)
-    puts
-    print "\n>".colorize(:green)
+    print "\nWhich way do you want to go?\n> ".colorize(:green)
 
-    handle_input(gets.chomp)
+    handle_input
   end
 end
