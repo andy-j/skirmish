@@ -21,8 +21,8 @@ class Character
   def add_xp(gain)
     @xp += gain
 
-    if @xp >= 400   # level up!
-      puts "Congratulations, you have gained a level!"
+    while @xp >= 400   # level up!
+      puts "Congratulations, you have gained a level! You are now level #{@level}"
       @xp =- 400
       @attack += rand(10..20)
       @defence += rand(10..20)
@@ -46,12 +46,12 @@ def get_player_choice
   print "(A)ttack, (D)efend, or (F)lee? "
 
   case gets.chomp
-    when /\Aa/i then return "attack"
-    when /\Ad/i then return "defend"
-    when /\Af/i then return "flee"
+    when /\Aa/i then "attack"
+    when /\Ad/i then "defend"
+    when /\Af/i then "flee"
   else
     puts "I'm sorry, that's not an option."
-    return get_player_choice
+    get_player_choice
   end
 end
 
@@ -67,17 +67,17 @@ end
 
 def player_action(protagonist, antagonist, choice)
   case choice
-  when "attack"
-    damage = protagonist.attack * rand(1..3) / 10
-    antagonist.hp -= damage
-    return "Your attack did #{damage} damage to #{antagonist.name}!"
-  when "defend"
-    restore = protagonist.defence * rand(1..2) / 15
-    protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    return "You restored #{restore} hitpoints!"
-  when "flee"
-    puts "#{antagonist.name} laughs as you run away like a coward."
-    exit
+  	when "attack"
+    		damage = protagonist.attack * rand(1..3) / 10
+    		antagonist.hp -= damage
+    		"Your attack did #{damage} damage to #{antagonist.name}!"
+  	when "defend"
+    		restore = protagonist.defence * rand(1..2) / 15
+    		protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
+    		"You restored #{restore} hitpoints!"
+  	when "flee"
+    		puts "#{antagonist.name} laughs as you run away like a coward."
+    		exit
   end
 end
 
@@ -86,11 +86,11 @@ def enemy_action(protagonist, antagonist, choice)
   when "attack"
     damage = protagonist.attack * rand(1..3) / 10
     antagonist.hp -= damage
-    return "#{protagonist.name}'s attack did #{damage} damage!"
+    "#{protagonist.name}'s attack did #{damage} damage!"
   when "defend"
     restore = protagonist.defence * rand(1..2) / 15
     protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    return "#{protagonist.name} restored #{restore} hitpoints!"
+    "#{protagonist.name} restored #{restore} hitpoints!"
   end
 end
 
