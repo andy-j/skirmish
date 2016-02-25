@@ -43,9 +43,7 @@ class Character
 end
 
 def get_player_choice
-  print "(A)ttack, (D)efend, or (F)lee? "
-
-  case prompt_user
+  case prompt_user "(A)ttack, (D)efend, or (F)lee?"
     when /\Aa/i then :attack
     when /\Ad/i then :defend
     when /\Af/i then :flee
@@ -70,13 +68,13 @@ def player_action(protagonist, antagonist, choice)
   	when :attack
     		damage = protagonist.attack * rand(1..3) / 10
     		antagonist.hp -= damage
-    		"Your attack did #{damage} damage to #{antagonist.name}!"
+    		"Your attack did #{damage} damage to #{antagonist.name}!".colorize :red
   	when :defend
     		restore = protagonist.defence * rand(1..2) / 15
     		protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    		"You restored #{restore} hitpoints!"
+    		"You restored #{restore} hitpoints!".colorize :red
   	when :flee
-    		puts "#{antagonist.name} laughs as you run away like a coward."
+    		puts "#{antagonist.name} laughs as you run away like a coward.".colorize :red
     		exit
   end
 end
@@ -96,7 +94,7 @@ end
 
 def handle_input
   	new_location = $world.get_destination($player.location,
-		case prompt_user
+		case prompt_user "\nWhich way do you want to go?"
 			when /\An/i then 0
 			when /\Ae/i then 1
 			when /\As/i then 2
@@ -111,9 +109,12 @@ def handle_input
     	$player.location = new_location
 end
 
-def prompt_user # custom prompt
-	print "\n> ".colorize :green
-	STDIN.gets.chomp
+def prompt_user(prompt="") # custom prompt
+	print prompt.colorize :light_green
+	print "\n> ".colorize :light_green
+	input = STDIN.gets.chomp
+	puts
+	input
 end
 
 if __FILE__ == $0
@@ -121,15 +122,11 @@ if __FILE__ == $0
 
   $world = World.new "30.wld"
 
-  print "Welcome! What is your name? ".colorize(:green)
-
-  $player = Character.new prompt_user
-  puts
+  $player = Character.new prompt_user("Welcome! What is your name?")
 
   loop do # starts an infinite loop
     puts $world.get_room_name($player.location).colorize(:light_blue)
     puts $world.get_room_description($player.location).colorize(:green)
-    print "\nWhich way do you want to go?".colorize(:green)
 
     handle_input
   end
