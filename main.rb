@@ -43,12 +43,10 @@ class Character
 end
 
 def get_player_choice
-  print "(A)ttack, (D)efend, or (F)lee? "
-
-  case gets.chomp
-    when /\Aa/i then "attack"
-    when /\Ad/i then "defend"
-    when /\Af/i then "flee"
+  case prompt_user "(A)ttack, (D)efend, or (F)lee?"
+    when /\Aa/i then :attack
+    when /\Ad/i then :defend
+    when /\Af/i then :flee
   else
     puts "I'm sorry, that's not an option.\n"
     get_player_choice
@@ -56,7 +54,7 @@ def get_player_choice
 end
 
 def get_enemy_choice(defence, attack)
-  (rand(defense + attack) < defence) ? "defend" : "attack"
+  (rand(defense + attack) < defence) ? :defend : :attack
 end
 
 def fill_name_array(names)
@@ -67,27 +65,27 @@ end
 
 def player_action(protagonist, antagonist, choice)
   case choice
-  	when "attack"
+  	when :attack
     		damage = protagonist.attack * rand(1..3) / 10
     		antagonist.hp -= damage
-    		"Your attack did #{damage} damage to #{antagonist.name}!"
-  	when "defend"
+    		"Your attack did #{damage} damage to #{antagonist.name}!".colorize :red
+  	when :defend
     		restore = protagonist.defence * rand(1..2) / 15
     		protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
-    		"You restored #{restore} hitpoints!"
-  	when "flee"
-    		puts "#{antagonist.name} laughs as you run away like a coward."
+    		"You restored #{restore} hitpoints!".colorize :red
+  	when :flee
+    		puts "#{antagonist.name} laughs as you run away like a coward.".colorize :red
     		exit
   end
 end
 
 def enemy_action(protagonist, antagonist, choice)
   case choice
-  when "attack"
+  when :attack
     damage = protagonist.attack * rand(1..3) / 10
     antagonist.hp -= damage
     "#{protagonist.name}'s attack did #{damage} damage!"
-  when "defend"
+  when :defend
     restore = protagonist.defence * rand(1..2) / 15
     protagonist.hp = [protagonist.defence, protagonist.hp + restore].min
     "#{protagonist.name} restored #{restore} hitpoints!"
@@ -96,7 +94,7 @@ end
 
 def handle_input
   	new_location = $world.get_destination($player.location,
-		case gets.chomp
+		case prompt_user "\nWhich way do you want to go?"
 			when /\An/i then 0
 			when /\Ae/i then 1
 			when /\As/i then 2
@@ -111,20 +109,24 @@ def handle_input
     	$player.location = new_location
 end
 
+def prompt_user(prompt="") # custom prompt
+	print prompt.colorize :light_green
+	print "\n> ".colorize :light_green
+	input = STDIN.gets.chomp
+	puts
+	input
+end
+
 if __FILE__ == $0
   fill_name_array %w(Mike Joe Alice Susan)
 
   $world = World.new "30.wld"
 
-  print "Welcome! What is your name? ".colorize(:green)
-
-  $player = Character.new gets.chomp
-  puts
+  $player = Character.new prompt_user("Welcome! What is your name?")
 
   loop do # starts an infinite loop
     puts $world.get_room_name($player.location).colorize(:light_blue)
     puts $world.get_room_description($player.location).colorize(:green)
-    print "\nWhich way do you want to go?\n> ".colorize(:green)
 
     handle_input
   end
