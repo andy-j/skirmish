@@ -51,13 +51,18 @@ end
 def handle_input
   input = prompt_user.to_s
 
+  if input.length == 0
+    puts ("Please enter a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
+    return
+  end
+
   matches = COMMANDS.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
   command = matches.first
 
   unless command.nil?
     command[1].call $player, input
   else
-    puts "'#{input}' is not a valid command.".colorize(:red)
+    puts ("'#{input}' is not a valid command. A list of commands is available by typing 'commands'.").colorize(:red)
   end
 end
 
@@ -75,18 +80,21 @@ if __FILE__ == $0
 
   $world = World.new "30.wld"
 
-  name = prompt_user "Welcome! What is your name?".colorize(:light_green)
+  until (name = prompt_user("Welcome! What is your name?")).length > 1 do
+    puts ("I'm sorry, your name must be at least two characters long.").colorize(:light_green)
+  end
+
   $player = Character.new(name)
 
   begin
     stats $player
     puts
     input = prompt_user "Is this acceptable (y/n)?"
-    $player = Character.new(name) if (input =~ /n/i)
-  end until input =~ /y/i
+    $player = Character.new(name) if (input =~ /\An/i)
+  end until input =~ /\Ay/i
 
   puts
-  look $player, nil
+  look $player
 
   # loop until player inputs the 'quit' command
   loop {break if handle_input == :quit}
