@@ -22,30 +22,33 @@ module Commands
     			puts "You can't go that way!".colorize(:green)
   		end
 	end
+# list the available exits from the room the player is currently in
+def list_exits(character, input=nil)
+  exits = $world.get_exits(character.location)
 
-	# list the commands available to the player
-	def list(character, input=nil)
-  		commands = COMMANDS.keys
+  print ("[ Exits: ").colorize(:light_blue)
+  print ("#{exits.shift} ").colorize(:light_blue) until exits.empty?
+  print ("]\n").colorize(:light_blue)
+end
 
- 		lines = commands.length / 4
- 		leftover = commands.length % 4
+# list the commands available to the player
+def list_commands(character, input)
+  commands = COMMANDS.keys
+  columns = 5
+  width = 75
 
-  		for i in 0...lines
-    			puts ("%10s    %10s    %10s    %10s" % [commands[4*i], commands[4*i+1], commands[4*i+2], commands[4*i+3]]).colorize(:light_blue)
-  		end
+  # assume 75-character window
+  until commands.empty? do
+    columns.times {print ("%#{width/columns}s" % commands.pop).colorize(:light_blue)}
+    puts()
+  end
+end
 
-  		for i in 0...leftover
-    			print ("%10s    " % commands[i-1]).colorize(:light_blue)
-  		end
-  		puts
-	end
-
-	# display room name and description to character
-	def look(character, keyword=nil)
-  		puts $world.get_room_name(character.location).colorize(:light_blue)
-  		puts $world.get_room_description(character.location).colorize(:green)
-	end
-
+# display room name and description to character
+def look(character, keyword=nil)
+  puts $world.get_room_name(character.location).colorize(:light_blue)
+  puts $world.get_room_description(character.location).colorize(:green)
+end
 	# show player's statistics
 	def stats(character, input=nil)
 
@@ -81,7 +84,8 @@ module Commands
               		up: Commands.method(:move_character),
               		down: Commands.method(:move_character),
 
-              		commands: self.method(:list),
+              		commands: self.method(:list_commands),
+			exits:	self.method(:list_exits),
               		look: self.method(:look),
               		stats: self.method(:stats),
               		quit: self.method(:quit)

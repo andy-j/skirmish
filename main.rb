@@ -85,7 +85,6 @@ if __FILE__ == $0
     $player = Character.new(name) if (input =~ /n/i)
   end until input =~ /y/i
 
-
   puts
   look $player, nil
 

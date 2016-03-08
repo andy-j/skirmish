@@ -44,16 +44,33 @@ class World
     end
   end
 
+  # if we know about the room in question, return its name
   def get_room_name(room_number)
     @rooms.key?(room_number) ? @rooms[room_number].name : nil
   end
 
+  # if we know about the room in question, return its description
   def get_room_description(room_number)
     @rooms.key?(room_number) ? @rooms[room_number].description : nil
   end
 
+  # if we know about the room in question, and have data for the room in the
+  # specified direction, return the number of the destination room
   def get_destination(room_number, direction)
     @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
+  end
+
+  def get_exits(room_number)
+    directions = ["N", "E", "S", "W", "U", "D"]
+    exits = Array.new
+
+    6.times do |i|
+      if @rooms.key?(@rooms[room_number].direction_data[i])
+        exits.push(directions[i])
+      end
+    end
+
+    return exits
   end
 
 end
