@@ -25,17 +25,13 @@ end
 def cmd_list_commands(character, input)
   commands = $commands.keys
 
-  lines = commands.length / 4
-  leftover = commands.length % 4
-
-  for i in 0...lines
-    puts ("%10s    %10s    %10s    %10s" % [commands[4*i], commands[4*i+1], commands[4*i+2], commands[4*i+3]]).colorize(:light_blue)
+  # assume 80-character window; print 5 columns of 15 = 75 characters per line
+  until commands.empty? do
+    5.times do
+      print ("%15s" % commands.pop).colorize(:light_blue)
+    end
+    print "\n"
   end
-
-  for i in 0...leftover
-    print ("%10s    " % commands[i-1]).colorize(:light_blue)
-  end
-  puts
 end
 
 # display room name and description to character

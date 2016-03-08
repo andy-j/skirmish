@@ -6,7 +6,7 @@ require_relative 'utilities'
 require_relative 'commands'
 
 # List of commands that can be used in the game. Command methods must be defined
-# in 'commands.rb' in order to be usable - a
+# in 'commands.rb' in order to be usable
 $commands = { "north" => method(:cmd_move_character),
               "east" => method(:cmd_move_character),
               "south" => method(:cmd_move_character),
@@ -103,7 +103,6 @@ if __FILE__ == $0
       $player = Character.new(name)
     end
   end until input =~ /y/i
-
 
   puts
   cmd_look($player, nil)
