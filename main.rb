@@ -69,13 +69,18 @@ end
 def handle_input
   input = prompt_user
 
+  if input.length == 0
+    puts ("Please enter a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
+    return
+  end
+
   matches = $commands.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
   command = matches.first
 
   unless command.nil?
     return command[1].call($player, input)
   else
-    puts "\"#{input}\" is not a valid command."
+    puts ("\"#{input}\" is not a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
   end
 end
 
@@ -85,7 +90,7 @@ def prompt_user(prompt="")
 	print "\n> ".colorize :light_green
 	input = STDIN.gets.chomp
 	puts
-	return input
+  return input
 end
 
 if __FILE__ == $0
@@ -93,7 +98,10 @@ if __FILE__ == $0
 
   $world = World.new "30.wld"
 
-  name = prompt_user("Welcome! What is your name?")
+  until (name = prompt_user("Welcome! What is your name?")).length > 1 do
+    puts ("I'm sorry, your name must be at least two characters long.").colorize(:light_green)
+  end
+
   $player = Character.new(name)
 
   begin
