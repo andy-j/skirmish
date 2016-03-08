@@ -24,11 +24,13 @@ end
 # list the commands available to the player
 def cmd_list_commands(character, input)
   commands = $commands.keys
+  columns = 5
+  width = 75
 
-  # assume 80-character window; print 5 columns of 15 = 75 characters per line
+  # assume 75-character window
   until commands.empty? do
-    5.times do
-      print ("%15s" % commands.pop).colorize(:light_blue)
+    columns.times do
+      print ("%#{width/columns}s" % commands.pop).colorize(:light_blue)
     end
     print "\n"
   end
