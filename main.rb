@@ -4,22 +4,7 @@ require 'colorize'
 require_relative 'world'
 require_relative 'utilities'
 require_relative 'commands'
-
-# List of commands that can be used in the game. Command methods must be defined
-# in 'commands.rb' in order to be usable - a
-$commands = { "north" => method(:cmd_move_character),
-              "east" => method(:cmd_move_character),
-              "south" => method(:cmd_move_character),
-              "west" => method(:cmd_move_character),
-              "up" => method(:cmd_move_character),
-              "down" => method(:cmd_move_character),
-
-              "commands" => method(:cmd_list_commands),
-              "look" => method(:cmd_look),
-              "stats" => method(:cmd_stats),
-              "quit" => method(:cmd_quit)
-}
-
+include Commands
 class Character
   attr_accessor :name, :height, :weight, :str, :dex, :con, :int, :wis, :cha,
     :maxhp, :hp, :xp, :armour, :level, :state, :location
@@ -28,15 +13,13 @@ class Character
   def initialize(name, initial_level=1)
     @name = name
 
-    size_roll = roll_dice(2, 10)
-    @height = 54 + size_roll                        #inches
-    @weight = 110 + roll_dice(2, 4) * size_roll     #pounds
+    size_roll = roll_dice 2, 10
+    @height = 54 + size_roll                        # inches
+    @weight = 110 + roll_dice(2, 4) * size_roll     # pounds
 
     # roll 3d6 for attributes
     rolls = Array.new
-    6.times do
-      rolls.push(roll_dice(3,6))
-    end
+    6.times {rolls.push roll_dice(3,6)}
     rolls.sort! { |a, b| a <=> b }
 
     @str = rolls.pop()
@@ -55,36 +38,36 @@ class Character
 
   # Character's attack each time is calculated based on a roll of 1d10 * level
   def attack
-    return roll_dice(1, 10) * @level
+    roll_dice(1, 10) * @level
   end
 end
 
 def fill_name_array(names)
-  f = File.open("names") or die "Unable to open 'names' file."
+  f = File.open("names") or die "Unable to open 'names' file.".colorize(:red)
   f.each_line {|name| names.push name}
   f.close
 end
 
 def handle_input
-  input = prompt_user
+  input = prompt_user.to_s
 
-  matches = $commands.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
+  matches = COMMANDS.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
   command = matches.first
 
   unless command.nil?
-    return command[1].call($player, input)
+    command[1].call $player, input
   else
-    puts "\"#{input}\" is not a valid command."
+    puts "'#{input}' is not a valid command.".colorize(:red)
   end
 end
 
 # receive input from user with optional string as prompt
-def prompt_user(prompt="")
-	print prompt.colorize :light_green
-	print "\n> ".colorize :light_green
+def prompt_user(prompt=String.new)
+	puts prompt.colorize(:light_green)
+	print "> ".colorize(:light_green)
 	input = STDIN.gets.chomp
-	puts
-	return input
+	puts()
+	input.sub /\Ago\s/i, ''
 end
 
 if __FILE__ == $0
@@ -92,26 +75,20 @@ if __FILE__ == $0
 
   $world = World.new "30.wld"
 
-  name = prompt_user("Welcome! What is your name?")
+  name = prompt_user "Welcome! What is your name?"
   $player = Character.new(name)
 
   begin
-    cmd_stats($player, nil)
+    stats $player
     puts
-    input = prompt_user("Is this acceptable (y/n)?")
-    if (input =~ /n/i)
-      $player = Character.new(name)
-    end
+    input = prompt_user "Is this acceptable (y/n)?"
+    $player = Character.new(name) if (input =~ /n/i)
   end until input =~ /y/i
 
 
   puts
-  cmd_look($player, nil)
+  look $player, nil
 
   # loop until player inputs the 'quit' command
-  loop do
-    if handle_input == "quit"
-      break
-    end
-  end
+  loop {break if handle_input == :quit}
 end

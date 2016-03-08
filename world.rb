@@ -17,25 +17,25 @@ class World
 
       new_room.description = room.shift
       line = room.shift
-      until line == "~"
-        new_room.description.concat "\n"
+      until line == ?~
+        new_room.description.concat ?\n
         new_room.description.concat line
         line = room.shift
       end
 
       2.times {line = room.shift}
 
-      until line == "S"
-        if line[0] == "D"
+      until line == ?S
+        if line[0] == ?D
           direction = line[1]
           dest = room.shift
-          dest = room.shift until dest == "~"
+          dest = room.shift until dest == ?~
           room.shift
-          dest = room.shift.split[-1]
+          dest = room.shift.split.last
           new_room.direction_data.store(direction.to_i, dest.to_i)
           line = room.shift
         else
-          line = room.shift until line == "~"
+          line = room.shift until line == ?~
           line = room.shift
         end
       end
