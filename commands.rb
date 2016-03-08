@@ -24,7 +24,7 @@ module Commands
 	end
 
 	# list the commands available to the player
-	def list(character, input)
+	def list(character, input=nil)
   		commands = COMMANDS.keys
 
  		lines = commands.length / 4

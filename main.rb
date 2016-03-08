@@ -75,7 +75,7 @@ if __FILE__ == $0
 
   $world = World.new "30.wld"
 
-  name = prompt_user "Welcome! What is your name?"
+  name = prompt_user "Welcome! What is your name?".colorize(:light_green)
   $player = Character.new(name)
 
   begin
