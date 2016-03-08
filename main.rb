@@ -2,6 +2,20 @@
 
 require 'colorize'
 require_relative 'world'
+require_relative 'commands'
+
+# List of commands that can be used in the game. Command methods must be defined
+# in 'commands.rb' in order to be usable - a
+$commands = { "north" => method(:cmd_move_character),
+              "east" => method(:cmd_move_character),
+              "south" => method(:cmd_move_character),
+              "west" => method(:cmd_move_character),
+              "up" => method(:cmd_move_character),
+              "down" => method(:cmd_move_character),
+
+              "look" => method(:cmd_look),
+              "quit" => method(:cmd_quit)
+}
 
 class Character
   attr_accessor :name, :hp, :xp, :attack, :defence, :level, :state, :location
@@ -93,20 +107,16 @@ def enemy_action(protagonist, antagonist, choice)
 end
 
 def handle_input
-  	new_location = $world.get_destination($player.location,
-		case prompt_user "\nWhich way do you want to go?"
-			when /\An/i then 0
-			when /\Ae/i then 1
-			when /\As/i then 2
-			when /\Aw/i then 3
-			when /\Au/i then 4
- 			when /\Ad/i then 5
-		else
-			puts "\nYou can't go that way!".colorize(:green)
-			return handle_input
-		end
-	)
-    	$player.location = new_location
+  input = prompt_user
+
+  matches = $commands.select { |c| c =~ /\A#{Regexp.escape(input)}/i }
+  command = matches.first
+
+  unless command.nil?
+    command[1].call($player, input)
+  else
+    puts "\"#{input}\" is not a valid command."
+  end
 end
 
 def prompt_user(prompt="") # custom prompt
@@ -123,11 +133,11 @@ if __FILE__ == $0
   $world = World.new "30.wld"
 
   $player = Character.new prompt_user("Welcome! What is your name?")
+  cmd_look($player, nil)
 
   loop do # starts an infinite loop
-    puts $world.get_room_name($player.location).colorize(:light_blue)
-    puts $world.get_room_description($player.location).colorize(:green)
-
-    handle_input
+    if handle_input == "quit"
+      break
+    end
   end
 end
