@@ -60,6 +60,19 @@ class World
     @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
   end
 
+  def get_exits(room_number)
+    directions = ["N", "E", "S", "W", "U", "D"]
+    exits = Array.new
+
+    6.times do |i|
+      if @rooms.key?(@rooms[room_number].direction_data[i])
+        exits.push(directions[i])
+      end
+    end
+
+    return exits
+  end
+
 end
 
 class DescriptionData

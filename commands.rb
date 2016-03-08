@@ -21,6 +21,17 @@ def cmd_move_character(character, direction)
   end
 end
 
+# list the available exits from the room the player is currently in
+def cmd_list_exits(character, input)
+  exits = $world.get_exits(character.location)
+
+  print ("[ Exits: ").colorize(:light_blue)
+  until exits.empty? do
+    print ("#{exits.shift} ").colorize(:light_blue)
+  end
+  print ("]\n").colorize(:light_blue)
+end
+
 # list the commands available to the player
 def cmd_list_commands(character, input)
   commands = $commands.keys
@@ -40,6 +51,7 @@ end
 def cmd_look(character, keyword)
   puts $world.get_room_name(character.location).colorize(:light_blue)
   puts $world.get_room_description(character.location).colorize(:green)
+  cmd_list_exits(character, nil)
 end
 
 # show player's statistics

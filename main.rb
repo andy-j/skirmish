@@ -15,6 +15,7 @@ $commands = { "north" => method(:cmd_move_character),
               "down" => method(:cmd_move_character),
 
               "commands" => method(:cmd_list_commands),
+              "exits" => method(:cmd_list_exits),
               "look" => method(:cmd_look),
               "stats" => method(:cmd_stats),
               "quit" => method(:cmd_quit)
