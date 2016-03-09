@@ -20,7 +20,7 @@ module Commands
     			character.location = new_location
     			look character
   		else
-    			puts "You can't go that way!".colorize(:green)
+    			puts "You can't go that way!".colorize(:red)
   		end
 	end
 # list the available exits from the room the player is currently in
@@ -33,7 +33,7 @@ def list_exits(character, input=nil)
 end
 
 # list the commands available to the player
-def list_commands(character, input)
+def list_commands(character, input=nil)
   commands = COMMANDS.keys
   columns = 5
   width = 75
