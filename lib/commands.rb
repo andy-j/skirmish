@@ -60,13 +60,13 @@ end
   		puts ("You are level %d and have %d experience points." %
   		[character.level, character.xp]).colorize(:green)
   		puts ("============================================================").colorize(:green)
-  		puts ("Hitpoints:   %6d / %d" % [character.hp, character.maxhp]).colorize(:green)
+  		puts ("Hitpoints:   %6d / %d" % [character.hp, character.max_hp]).colorize(:green)
   		puts ("Attack:      %6d - %2d" % [character.level, character.level * 10]).colorize(:green)
   		puts ("Armour:           %6d" % character.armour).colorize(:green)
   		puts ("============================================================").colorize(:green)
-  		puts ("Strength:    %6d                     Charisma:    %6d" % [character.str, character.cha]).colorize(:green)
-  		puts ("Constitution:%6d                     Wisdom:      %6d" % [character.con, character.wis]).colorize(:green)
-  		puts ("Dexterity:   %6d                     Intelligence:%6d" % [character.dex, character.int]).colorize(:green)
+  		puts ("Strength:    %6d                     Charisma:    %6d" % [character.strength, character.charisma]).colorize(:green)
+  		puts ("Constitution:%6d                     Wisdom:      %6d" % [character.constitution, character.wisdom]).colorize(:green)
+  		puts ("Dexterity:   %6d                     Intelligence:%6d" % [character.dexterity, character.intelligence]).colorize(:green)
 	end
 
 	# quit! maybe save something sometime in the future?
