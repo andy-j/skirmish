@@ -1,3 +1,4 @@
+require_relative "utilities"
 # Implementation of player commands. Each command must accept two arguments - a
 # character object and the original input string.
 module Commands
@@ -73,8 +74,10 @@ end
   		unless input =~ /quit/i
     			puts "You must type the entire word 'quit' to quit."
   		else
-    			puts "Until next time...\n".colorize(:green)
-    			:quit
+			if prompt_user("Are you sure you want to exit?") =~ /\Ay/i
+    				puts "Until next time...\n".colorize(:green)
+    				:quit
+			end
   		end
 	end
 	COMMANDS = {	north: Commands.method(:move_character),

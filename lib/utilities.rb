@@ -10,7 +10,6 @@ module Utilities # various utility functions - die rolling, etc.
     			roll += rand(1..size_of_dice)
     			i += 1
   		end
-
  		roll
 	end
 
@@ -23,7 +22,7 @@ module Utilities # various utility functions - die rolling, etc.
 	def handle_input
 		input = prompt_user
 		if input.length.zero?
-    			puts ("Please enter a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
+    			puts ("Please enter a valid command. A list of commands is available by typing 'commands'.").colorize(:red)
     			return
   		end
 
