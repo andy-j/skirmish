@@ -1,7 +1,7 @@
 class Creature
 	attr_accessor :hp
 	attr_reader :max_hp
-	def initialize(health=rand(100).round, stats=Hash.new {|hash, key| hash[key] = rand(15).ceil})
+	def initialize(health=rand(100).ceil, stats=Hash.new {|hash, key| hash[key] = rand(15).ceil})
 		@max_hp = @hp = health
 
 		stats[:xp] ||= 1
@@ -17,7 +17,7 @@ class Creature
 
 	# Character's attack each time is calculated based on a roll of 1d10 * level
   	def melee_power
-    		rand(strength).round * dexterity
+    		rand(strength).ceil * dexterity
   	end
 
 	def alive?
@@ -28,7 +28,7 @@ class Creature
 	end
 
         def magic_power
-		rand(intelligence).round * dexterity
+		(rand(intelligence) * rand(1..dexterity)).ceil
         end
 	def power
 		(intelligence >= strength) ? magic_power : melee_power
@@ -41,7 +41,7 @@ class Creature
 	def power_type
 		(intelligence >= strength) ? :magic : :melee
   	end
-	def heal
+	def heal # TODO make less overpowered
     		@hp += constitution
     		@hp = max_hp if @hp > max_hp
  	end 	

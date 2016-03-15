@@ -14,7 +14,7 @@ class Character < Creature
     		size_roll = rand(20).ceil
     		stats[:height] = 54 + size_roll                        # inches
     		stats[:weight] = 110 + rand(8).ceil * size_roll     # pounds
-		stats[:armour] = 0
+		stats[:armour] = 0 # Not implemented yet
 
                 @base_stats = stats.dup.freeze
                 @stat_modifiers = Hash.new {|hash, key| hash[key] = rand(@base_stats.fetch key)}
@@ -22,7 +22,7 @@ class Character < Creature
 
 		max_hp_modifier = 0 # Make sure following line runs at least once
                 max_hp_modifier = rand(10) until max_hp_modifier > 1 
-		max_hp = proc { (stats[:constitution] * max_hp_modifier).round }
+		max_hp = proc { (stats[:constitution] * max_hp_modifier).ceil }
 
 		super(max_hp.call, stats)
                 
@@ -44,7 +44,7 @@ class Character < Creature
            	raise "Expected xp to be at least 400. Got #{xp}." unless xp >= 400
                 @xp -= 400 
 		@level += 1
-                @stats.each_pair {|key, value| @stats[key] = (@base_stats[key] * level * @stat_modifiers[key]).round}
+                @stats.each_pair {|key, value| @stats[key] = (@base_stats[key] * level * @stat_modifiers[key]).ceil}
         end 	
                         
 end
