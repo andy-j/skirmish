@@ -1,46 +1,50 @@
 require "colorize"
-class Character
-  attr_accessor :name, :height, :weight, :strength, :dexterity, :constitution, :intelligence, :wisdom, :charisma,
-    :max_hp, :hp, :xp, :armour, :level, :state, :location
-  # Create the character, which by default begins at level one
-  def initialize(name, initial_level=1)
-    @name = name
+require_relative "utilities"
+require_relative "creature"
+class Character < Creature
+  	attr_reader :name, :height, :weight, :level
+  	attr_accessor :xp, :armour, :state, :location
+  	# Create the character, which by default begins at level one
+ 	def initialize(name, initial_level=1) # Create the character, which by default begins at level one
+    		@name = name
+		@level = initial_level
+		
+		stats = Hash.new {|hash, key| hash[key] = rand(2...16).ceil}
+		%i(strength constitution dexterity charisma wisdom intelligence).each { |stat| stats[stat] }
+    		size_roll = rand(20).ceil
+    		stats[:height] = 54 + size_roll                        # inches
+    		stats[:weight] = 110 + rand(8).ceil * size_roll     # pounds
+		stats[:armour] = 0
 
-    size_roll = roll_dice 2, 10
-    @height = 54 + size_roll                        # inches
-    @weight = 110 + roll_dice(2, 4) * size_roll     # pounds
+                @base_stats = stats.dup.freeze
+                @stat_modifiers = Hash.new {|hash, key| hash[key] = rand(@base_stats.fetch key)}
+		@stat_modifiers.freeze
 
-    # roll 3d6 for attributes
-    rolls = Array.new
-    6.times {rolls.push roll_dice(3,6)}
-    rolls.sort! { |a, b| a <=> b }
+		max_hp_modifier = 0 # Make sure following line runs at least once
+                max_hp_modifier = rand(10) until max_hp_modifier > 1 
+		max_hp = proc { (stats[:constitution] * max_hp_modifier).round }
 
-    @strength = rolls.pop()
-    @constitution = rolls.pop()
-    @dexterity = rolls.pop()
-    @charisma = rolls.pop()
-    @wisdom = rolls.pop()
-    @intelligence = rolls.pop()
-    @max_hp = @constitution + 10
-    @hp = @max_hp
-    @xp = 0
-    @armour = @dexterity + 10
-    @level = initial_level
-    @location = 3001
+		super(max_hp.call, stats)
+                
+		define_singleton_method(:max_hp, max_hp)
+    		
+		@xp = 0
+    		@location = 3001
   end
-
-  # Character's attack each time is calculated based on a roll of 1d10 * level
-  def attack
-    roll_dice(1, 10) * @level
-  end
-  def heal
-    @hp += rand(@constitution).round
-    @hp = max_hp if @hp > @max_hp
-  end
-  def level_up
-	while @xp >= 400
-	  puts "You leveled up! You are now level #{@level += 1}!".colorize(:green)
-	  @xp -= 400
-       end
-  end
+	def gain_xp(amount)
+		raise TypeError unless amount.is_a? Integer
+                @xp += amount
+		while @xp >= 400 # Level up while possible.
+                        level_up
+	  		puts "You leveled up! You are now level #{@level}!".colorize(:green)
+       		end
+  	end
+	private
+     	def level_up
+           	raise "Expected xp to be at least 400. Got #{xp}." unless xp >= 400
+                @xp -= 400 
+		@level += 1
+                @stats.each_pair {|key, value| @stats[key] = (@base_stats[key] * level * @stat_modifiers[key]).round}
+        end 	
+                        
 end
