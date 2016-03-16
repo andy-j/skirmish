@@ -17,7 +17,7 @@ def cmd_move_character(character, direction)
     character.location = new_location
     cmd_look(character, nil)
   else
-    puts "You can't go that way!".colorize(:green)
+    print_line("You can't go that way!")
   end
 end
 
@@ -25,32 +25,28 @@ end
 def cmd_list_exits(character, input)
   exits = $world.get_exits(character.location)
 
-  print ("[ Exits: ").colorize(:light_blue)
+  exits_list = "[ Exits: "
   until exits.empty? do
-    print ("#{exits.shift} ").colorize(:light_blue)
+    exits_list << "#{exits.shift} "
   end
-  print ("]\n").colorize(:light_blue)
+  exits_list << "]\n"
+
+  print_line(exits_list)
 end
 
 # list the commands available to the player
 def cmd_list_commands(character, input)
-  commands = $commands.keys
-  columns = 5
-  width = 75
+  commands = $COMMANDS.keys
 
-  # assume 75-character window
-  until commands.empty? do
-    columns.times do
-      print ("%#{width/columns}s" % commands.pop).colorize(:light_blue)
-    end
-    print "\n"
-  end
+  print_line(commands.join(" "))
+  print_line
+
 end
 
 # display room name and description to character
 def cmd_look(character, keyword)
-  puts $world.get_room_name(character.location).colorize(:light_blue)
-  puts $world.get_room_description(character.location).colorize(:green)
+  print_line($world.get_room_name(character.location))
+  print_line($world.get_room_description(character.location))
   cmd_list_exits(character, nil)
 end
 
@@ -60,27 +56,28 @@ def cmd_stats(character, input)
   feet = character.height / 12
   inches = character.height % 12
 
-  puts ("Your name is %s. You are %d'%d\" tall and you weigh %d lbs." %
-  [character.name, feet, inches, character.weight]).colorize(:green)
-  puts ("You are level %d and have %d experience points." %
-  [character.level, character.xp]).colorize(:green)
-  puts ("============================================================").colorize(:green)
-  puts ("Hitpoints:   %6d / %d" % [character.hp, character.maxhp]).colorize(:green)
-  puts ("Attack:      %6d - %2d" % [character.level, character.level * 10]).colorize(:green)
-  puts ("Armour:           %6d" % character.armour).colorize(:green)
-  puts ("============================================================").colorize(:green)
-  puts ("Strength:    %6d                     Charisma:    %6d" % [character.str, character.cha]).colorize(:green)
-  puts ("Constitution:%6d                     Wisdom:      %6d" % [character.con, character.wis]).colorize(:green)
-  puts ("Dexterity:   %6d                     Intelligence:%6d" % [character.dex, character.int]).colorize(:green)
+  print_line("Your name is %s. You are %d'%d\" tall and you weigh %d lbs." %
+  [character.name, feet, inches, character.weight])
+  print_line("You are level %d and have %d experience points." %
+  [character.level, character.xp])
+  print_line("============================================================")
+  print_line("Hitpoints:   %6d / %d" % [character.hp, character.maxhp])
+  print_line("Attack:      %6d - %2d" % [character.level, character.level * 10])
+  print_line("Armour:           %6d" % character.armour)
+  print_line("============================================================")
+  print_line("Strength:    %6d                     Charisma:    %6d" % [character.str, character.cha])
+  print_line("Constitution:%6d                     Wisdom:      %6d" % [character.con, character.wis])
+  print_line("Dexterity:   %6d                     Intelligence:%6d" % [character.dex, character.int])
+  print_line
 end
 
 # quit! maybe save something sometime in the future?
 def cmd_quit(character, input)
   unless input =~ /quit/i
-    puts "You must type the entire word 'quit' to quit."
+    print_line("You must type the entire word 'quit' to quit.")
   else
-    puts "Until next time...".colorize(:green)
-    puts
-    return "quit"
+    print_line("Until next time...")
+    $win.close
+    exit
   end
 end

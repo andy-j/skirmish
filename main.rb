@@ -1,13 +1,14 @@
 #!/usr/bin/env ruby
 
 require 'colorize'
+require 'curses'
 require_relative 'world'
 require_relative 'utilities'
 require_relative 'commands'
 
 # List of commands that can be used in the game. Command methods must be defined
 # in 'commands.rb' in order to be usable
-$commands = { "north" => method(:cmd_move_character),
+$COMMANDS = { "north" => method(:cmd_move_character),
               "east" => method(:cmd_move_character),
               "south" => method(:cmd_move_character),
               "west" => method(:cmd_move_character),
@@ -26,9 +27,15 @@ class Character
     :maxhp, :hp, :xp, :armour, :level, :state, :location
 
   # Create the character, which by default begins at level one
-  def initialize(name, initial_level=1)
+  def initialize(name="", initial_level=1, initial_location=3001)
+    @state = :CREATING
     @name = name
 
+    roll_stats(initial_level)
+    @location = initial_location
+  end
+
+  def roll_stats(initial_level)
     size_roll = roll_dice(2, 10)
     @height = 54 + size_roll                        #inches
     @weight = 110 + roll_dice(2, 4) * size_roll     #pounds
@@ -51,7 +58,6 @@ class Character
     @xp = 0
     @armour = @dex + 10
     @level = initial_level
-    @location = 3001
   end
 
   # Character's attack each time is calculated based on a roll of 1d10 * level
@@ -66,60 +72,67 @@ def fill_name_array(names)
   f.close
 end
 
-def handle_input
-  input = prompt_user
-
-  if input.length == 0
-    puts ("Please enter a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
-    return
-  end
-
-  matches = $commands.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
-  command = matches.first
-
-  unless command.nil?
-    return command[1].call($player, input)
-  else
-    puts ("\"#{input}\" is not a valid command. A list of commands is available by typing 'commands'.").colorize(:light_green)
-  end
-end
-
-# receive input from user with optional string as prompt
-def prompt_user(prompt="")
-	print prompt.colorize :light_green
-	print "\n> ".colorize :light_green
-	input = STDIN.gets.chomp
-	puts
-  return input
-end
-
 if __FILE__ == $0
   fill_name_array %w(Mike Joe Alice Susan)
 
   $world = World.new "30.wld"
 
-  until (name = prompt_user("Welcome! What is your name?")).length > 1 do
-    puts ("I'm sorry, your name must be at least two characters long.").colorize(:light_green)
-  end
+  Curses.init_screen
+  Curses.cbreak
+  Curses.noecho
+  Curses.nl
 
-  $player = Character.new(name)
+  $win = Curses::Window.new(Curses.lines - 5, 0, 0, 0)
+  $win.scrollok true
+  $win.idlok true
+  $win.keypad = true
 
-  begin
-    cmd_stats($player, nil)
-    puts
-    input = prompt_user("Is this acceptable (y/n)?")
-    if (input =~ /n/i)
-      $player = Character.new(name)
-    end
-  end until input =~ /y/i
+  $player = Character.new
+  $input_buffer = Array.new
 
-  puts
-  cmd_look($player, nil)
-
-  # loop until player inputs the 'quit' command
+  # main game loop. loops until player inputs the 'quit' command
   loop do
-    if handle_input == "quit"
-      break
+    case $player.state
+      when :CREATING
+
+        show_prompt("Welcome! What is your name? ")
+        name = get_input
+
+        unless name.nil?
+          print_line
+          $player.name = name
+          $player.state = :ROLLING
+        end
+
+      when :ROLLING
+        # turning on echo and blocking is kinda ugly, but we haven't started yet,
+        # so maybe it's not that bad...
+        Curses.echo
+
+        begin
+          print_line
+          cmd_stats($player, nil)
+          input = prompt_user("Is this acceptable (y/n)?")
+          if (input =~ /n/i)
+            $player = Character.new(name)
+          end
+        end until input =~ /y/i
+
+        print_line
+        cmd_look($player, nil)
+
+        Curses.noecho
+        $win.timeout = 100
+        $player.state = :PLAYING
+
+      when :PLAYING
+
+        show_prompt(">")
+        handle_input(get_input)
+        # do world stuff
+
+      when :FIGHTING
+        # fighting!
     end
   end
 end

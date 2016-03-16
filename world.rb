@@ -61,7 +61,7 @@ class World
   end
 
   def get_exits(room_number)
-    directions = ["N", "E", "S", "W", "U", "D"]
+    directions = ["n", "e", "s", "w", "u", "d"]
     exits = Array.new
 
     6.times do |i|
