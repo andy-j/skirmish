@@ -9,7 +9,7 @@ class World
     @characters = Array.new
 
     file = File.read(world_file).split(/^\#/).drop(1).each do |chunk|
-      room = chunk.split(/\r?\n|\r/)
+      room = chunk.split /\r?\n|\r/
       new_room = Room.new
 
       room_number = room.shift.to_i
@@ -17,25 +17,25 @@ class World
 
       new_room.description = room.shift
       line = room.shift
-      until line == "~"
-        new_room.description.concat "\n"
+      until line == ?~
+        new_room.description.concat ?\n
         new_room.description.concat line
         line = room.shift
       end
 
       2.times {line = room.shift}
 
-      until line == "S"
-        if line[0] == "D"
+      until line == ?S
+        if line[0] == ?D
           direction = line[1]
           dest = room.shift
-          dest = room.shift until dest == "~"
+          dest = room.shift until dest == ?~
           room.shift
-          dest = room.shift.split[-1]
-          new_room.direction_data.store(direction.to_i, dest.to_i)
+          dest = room.shift.split.last
+          new_room.direction_data.store direction.to_i, dest.to_i
           line = room.shift
         else
-          line = room.shift until line == "~"
+          line = room.shift until line == ?~
           line = room.shift
         end
       end
@@ -61,16 +61,12 @@ class World
   end
 
   def get_exits(room_number)
-    directions = ["N", "E", "S", "W", "U", "D"]
+    directions = %w[North East South West Up Down]
     exits = Array.new
 
-    6.times do |i|
-      if @rooms.key?(@rooms[room_number].direction_data[i])
-        exits.push(directions[i])
-      end
-    end
+    6.times { |i| exits.push(directions[i]) if @rooms.key?(@rooms[room_number].direction_data[i]) }
 
-    return exits
+    exits
   end
 
 end

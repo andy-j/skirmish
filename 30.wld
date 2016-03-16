@@ -1,6 +1,6 @@
 #3000
 The Reading Room~
-   You are in a small, simple room which is mostly empty, save a few
+ You are in a small, simple room which is mostly empty, save a few
 wooden desks and benches.  To the east you hear the bustle of the Temple
 of Midgaard, a sharp contrast to the relative quiet of this peaceful
 room.
@@ -14,13 +14,13 @@ You see the Temple of Midgaard.
 S
 #3001
 The Temple Of Midgaard~
-   You are in the southern end of the temple hall in the Temple of Midgaard.
+ You are in the southern end of the temple hall in the Temple of Midgaard.
 The temple has been constructed from giant marble blocks, eternal in
 appearance, and most of the walls are covered by ancient wall paintings
-picturing Gods, Giants and peasants.
-   Large steps lead down through the grand temple gate, descending the huge
+picturing gods, giants, and peasants.
+ Large steps lead down through the grand temple gate, descending the huge
 mound upon which the temple is built and ends on the temple square below.
-To the west, you see the Reading Room.  The donation room is in a small
+ To the west, you see the Reading Room.  The donation room is in a small
 alcove to your east.
 ~
 30 cdeh 0
@@ -53,7 +53,7 @@ You see the temple square.
 S
 #3002
 The Clerics' Inner Sanctum~
-   This is the inner sanctum.  A picture of the mighty Thor, is hanging on
+ This is the inner sanctum.  A picture of the mighty Thor, is hanging on
 the wall, just above the altar which is set against the western wall.  A well
 in the middle of the floor leads down into darkness.  Vile smells waft from
 the depths.
@@ -73,7 +73,7 @@ impossible to climb back up.
 S
 #3003
 The Bar Of Divination~
-   The bar is one of the finest in the land, lucky it is members only.  Fine
+ The bar is one of the finest in the land, lucky it is members only.  Fine
 furniture is set all around the room.  A small sign is hanging on the wall.
 ~
 30 cdh 0
@@ -117,9 +117,9 @@ You see the Temple Square.
 S
 #3005
 The Temple Square~
-   You are standing on the temple square.  Huge marble steps lead up to the
-temple gate.  The entrance to the Clerics' Guild is to the west, and the old
-Grunting Boar Inn, is to the east.  Just south of here you see the market
+   You are standing on the temple square. Huge marble steps lead up to the
+temple gate. The entrance to the Clerics' Guild is to the west, and the old
+Grunting Boar Inn, is to the east. Just south of here you see the market
 square, the center of Midgaard.
 ~
 30 0 1
