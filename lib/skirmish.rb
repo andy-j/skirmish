@@ -3,9 +3,11 @@ require_relative 'skirmish/world'
 require_relative 'skirmish/utilities'
 require_relative 'skirmish/commands'
 require_relative 'skirmish/character'
+#require_relative 'skirmish/creature'
+#require_relative 'skirmish/battle'
 
 class Skirmish
-
+  include Curses
   def self.play
 
     $world = World.new "lib/world/30.wld"
@@ -20,7 +22,7 @@ class Skirmish
       case $player.state
         when :CREATING
 
-          show_prompt("Welcome! What is your name? ")
+          show_prompt "Welcome! What is your name? "
           name = get_input
 
           unless name.nil?
@@ -32,28 +34,26 @@ class Skirmish
         when :ROLLING
           # turning on echo and blocking is kinda ugly, but we haven't started yet,
           # so maybe it's not that bad...
-          Curses.echo
+          echo
 
           begin
             print_line
-            cmd_stats($player, nil)
-            input = prompt_user("Is this acceptable (y/n)?")
-            if (input =~ /n/i)
-              $player = Character.new(name)
-            end
+            Commands::stats $player
+            input = prompt_user "Is this acceptable (y/n)?"
+            $player = Character.new(name) if (input =~ /n/i)
           end until input =~ /y/i
 
           print_line
-          cmd_look($player, nil)
+          Commands::look $player
 
-          Curses.noecho
+          noecho
           $win.timeout = 100
           $player.state = :PLAYING
 
         when :PLAYING
 
-          show_prompt(">")
-          handle_input(get_input)
+          show_prompt ?>
+          handle_input get_input
           # do world stuff
 
         when :FIGHTING
