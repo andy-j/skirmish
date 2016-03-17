@@ -11,10 +11,10 @@ class Character
     @location = initial_location
   end
 
-  def roll_stats(initial_level)
+  def roll_stats(initial_level = 1)
     size_roll = roll_dice(2, 10)
     @height = 60 + size_roll                        #inches
-    @weight = 110 + roll_dice(2, 4) * size_roll     #pounds
+    @weight = 110 + roll_dice(2, 3) * size_roll     #pounds
 
     # roll 3d6 for attributes
     rolls = Array.new

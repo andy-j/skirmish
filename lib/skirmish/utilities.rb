@@ -1,17 +1,66 @@
 # various utility functions - input, die rolling, etc.
 
+class Command_History
+  def initialize
+    @history = Array.new
+    @position = 0
+  end
+
+  def add_command(command)
+    @history.push command
+    @position = @history.length - 1
+  end
+
+  def get_last
+    unless @position == 0
+      last_command = @history[@position].split
+      @position -= 1
+      return last_command
+    else
+      return nil
+    end
+  end
+
+  def get_next
+    unless @position == @history.length - 1
+      @position += 1
+      next_command = @history[@position].split
+      return next_command
+    else
+      return nil
+    end
+  end
+end
+
 def get_input
   case char = $win.getch
     when Curses::KEY_BACKSPACE
       $input_buffer.pop
       return nil
 
+    when Curses::KEY_UP
+      last_command = $command_history.get_last
+      unless last_command.nil?
+        $input_buffer = Array.new
+        last_command.each { |chr|  $input_buffer.push chr }
+      end
+      return nil
+
+    when Curses::KEY_DOWN
+      next_command = $command_history.get_next
+      unless next_command.nil?
+        $input_buffer = Array.new
+        next_command.each { |chr|  $input_buffer.push chr }
+      end
+      return nil
+
     when 10 || 13   # KEY_ENTER is numpad enter - this matches \n or \r
       input = $input_buffer.join
       $input_buffer = Array.new
+      $command_history.add_command input
       return input
 
-    when /[[:print:]]/
+    when /[[:print:]]/  # add printable characters to our input buffer
       $input_buffer << char
       return nil
 
@@ -24,7 +73,7 @@ def setup_screen
   Curses.noecho
   Curses.nl
 
-  $win = Curses::Window.new(Curses.lines - 5, 0, 0, 0)
+  $win = Curses::Window.new(0, 0, 0, 0)
   $win.scrollok true
   $win.idlok true
   $win.keypad = true
@@ -36,7 +85,7 @@ def handle_input(input)
   end
 
   input.chomp!
-  print_line
+  $win.addstr("\n\n")
 
   if input.length == 0
     print_line("Please enter a valid command. A list of commands is available by typing 'commands'.\n")
@@ -68,6 +117,8 @@ def prompt_user(prompt=">")
 end
 
 def print_line(line = "")
+  $win.setpos($win.cury, 0)
+  $win.deleteln
   $win.addstr(line + "\n")
 end
 

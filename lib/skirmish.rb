@@ -7,54 +7,57 @@ require_relative 'skirmish/character'
 class Skirmish
 
   def self.play
-
     $world = World.new "lib/world/30.wld"
-
-    setup_screen
-
     $player = Character.new
     $input_buffer = Array.new
+    $command_history = Command_History.new
+    setup_screen
+    time = 0
 
     # main game loop. loops until player inputs the 'quit' command
     loop do
+      time += 1
+
       case $player.state
         when :CREATING
-
-          show_prompt("Welcome! What is your name? ")
+          show_prompt("Welcome! What is your name?")
           name = get_input
 
+          # TODO: Adding two newlines here is ugly.
           unless name.nil?
-            print_line
+            $win.addstr("\n\n")
             $player.name = name
             $player.state = :ROLLING
           end
 
         when :ROLLING
-          # turning on echo and blocking is kinda ugly, but we haven't started yet,
-          # so maybe it's not that bad...
-          Curses.echo
-
-          begin
-            print_line
+          # TODO: if the player begins typing and backspaces to the beginning of
+          # the line, this will re-print the stats readout - not ideal.
+          if $input_buffer.empty?
             cmd_stats($player, nil)
-            input = prompt_user("Is this acceptable (y/n)?")
-            if (input =~ /n/i)
-              $player = Character.new(name)
+          end
+
+          show_prompt("Is this acceptable (yes/no)?")
+          choice = get_input
+          unless choice.nil?
+            $win.addstr("\n\n")
+            if choice =~ /n/i
+              $player.roll_stats
+            elsif choice =~ /y/i
+              cmd_look($player, nil)
+
+              $win.timeout = 100
+              $player.state = :PLAYING
             end
-          end until input =~ /y/i
-
-          print_line
-          cmd_look($player, nil)
-
-          Curses.noecho
-          $win.timeout = 100
-          $player.state = :PLAYING
+          end
 
         when :PLAYING
+          if time % 20 == 0
+            # do world stuff
+          end
 
           show_prompt(">")
           handle_input(get_input)
-          # do world stuff
 
         when :FIGHTING
           # fighting!

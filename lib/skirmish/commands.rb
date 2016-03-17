@@ -17,7 +17,7 @@ def cmd_move_character(character, direction)
     character.location = new_location
     cmd_look(character, nil)
   else
-    print_line("You can't go that way!")
+    print_line("You can't go that way!\n")
   end
 end
 
@@ -74,9 +74,11 @@ end
 # quit! maybe save something sometime in the future?
 def cmd_quit(character, input)
   unless input =~ /quit/i
-    print_line("You must type the entire word 'quit' to quit.")
+    print_line("You must type the entire word 'quit' to quit.\n")
   else
     print_line("Until next time...")
+    $win.refresh
+    sleep(3)
     $win.close
     exit
   end
