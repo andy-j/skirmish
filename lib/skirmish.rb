@@ -8,7 +8,7 @@ class Skirmish
 
   def self.play
     $world = World.new "lib/world/30.wld"
-    $player = Character.new
+    $player = Player.new
     $input_buffer = Array.new
     $command_history = Command_History.new
     setup_screen

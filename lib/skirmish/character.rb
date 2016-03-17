@@ -36,8 +36,21 @@ class Character
     @level = initial_level
   end
 
-  # Character's attack each time is calculated based on a roll of 1d10 * level
-  def attack
-    return roll_dice(1, 10) * @level
+  # Character's attack each time is calculated based on a roll of 1d10 * level,
+  # or as otherwise specified
+  def attack(num=1, size=10)
+    return roll_dice(num, size) * @level
+  end
+end
+
+class Player < Character
+  def initialize
+    super()
+  end
+end
+
+class Mobile < Character
+  def initialize
+    super()
   end
 end

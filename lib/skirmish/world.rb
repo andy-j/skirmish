@@ -1,12 +1,15 @@
 # The following classes represent the world of the game -
 
 class World
-  @rooms
-  @characters
 
   def initialize(world_file)
     @rooms = Hash.new
     @characters = Array.new
+    @names = Array.new
+
+    f = File.open("lib/mobiles/names") or die "Unable to open 'names' file."
+    f.each_line {|name| @names.push name}
+    f.close
 
     file = File.read(world_file).split(/^\#/).drop(1).each do |chunk|
       room = chunk.split(/\r?\n|\r/)
@@ -40,7 +43,6 @@ class World
         end
       end
       @rooms[room_number] = new_room
-      #puts line
     end
   end
 

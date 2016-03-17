@@ -144,9 +144,3 @@ def roll_dice(number_of_dice, size_of_dice)
 
   roll
 end
-
-def fill_name_array(names)
-  f = File.open("lib/mobiles/names") or die "Unable to open 'names' file."
-  f.each_line {|name| names.push name}
-  f.close
-end
