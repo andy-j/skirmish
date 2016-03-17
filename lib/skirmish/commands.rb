@@ -36,7 +36,7 @@ end
 
 # list the commands available to the player
 def cmd_list_commands(character, input)
-  commands = $COMMANDS.keys
+  commands = $commands.keys
 
   print_line(commands.join(" "))
   print_line
@@ -81,3 +81,17 @@ def cmd_quit(character, input)
     exit
   end
 end
+
+$commands = { "north" => method(:cmd_move_character),
+              "east" => method(:cmd_move_character),
+              "south" => method(:cmd_move_character),
+              "west" => method(:cmd_move_character),
+              "up" => method(:cmd_move_character),
+              "down" => method(:cmd_move_character),
+
+              "commands" => method(:cmd_list_commands),
+              "exits" => method(:cmd_list_exits),
+              "look" => method(:cmd_look),
+              "stats" => method(:cmd_stats),
+              "quit" => method(:cmd_quit)
+}

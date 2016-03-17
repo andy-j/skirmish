@@ -18,6 +18,18 @@ def get_input
   end
 end
 
+def setup_screen
+  Curses.init_screen
+  Curses.cbreak
+  Curses.noecho
+  Curses.nl
+
+  $win = Curses::Window.new(Curses.lines - 5, 0, 0, 0)
+  $win.scrollok true
+  $win.idlok true
+  $win.keypad = true
+end
+
 def handle_input(input)
   if input.nil?
     return
@@ -31,7 +43,7 @@ def handle_input(input)
     return
   end
 
-  matches = $COMMANDS.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
+  matches = $commands.select { |c| c =~ /\A#{Regexp.escape(input.split.first)}/i }
   command = matches.first
 
   unless command.nil?
@@ -69,4 +81,10 @@ def roll_dice(number_of_dice, size_of_dice)
   end
 
   roll
+end
+
+def fill_name_array(names)
+  f = File.open("lib/mobiles/names") or die "Unable to open 'names' file."
+  f.each_line {|name| names.push name}
+  f.close
 end
