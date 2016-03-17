@@ -7,7 +7,7 @@ class Character
     @state = :CREATING
     @name = name
 
-    roll_stats(initial_level)
+    roll_stats initial_level
     @location = initial_location
   end
 
@@ -19,7 +19,7 @@ class Character
     # roll 3d6 for attributes
     rolls = Array.new
     6.times do
-      rolls.push(roll_dice(3,6))
+      rolls.push roll_dice(3,6)
     end
     rolls.sort! { |a, b| a <=> b }
 

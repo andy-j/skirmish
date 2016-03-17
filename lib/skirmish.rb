@@ -13,6 +13,7 @@ class Skirmish
     $command_history = Command_History.new
     setup_screen
     time = 0
+    stats_displayed = false
 
     # main game loop. loops until player inputs the 'quit' command
     loop do
@@ -27,32 +28,38 @@ class Skirmish
           unless name.nil?
             $win.addstr("\n\n")
             $player.name = name
+            cmd_stats($player, nil)
             $player.state = :ROLLING
           end
 
         when :ROLLING
           # TODO: if the player begins typing and backspaces to the beginning of
           # the line, this will re-print the stats readout - not ideal.
-          if $input_buffer.empty?
-            cmd_stats($player, nil)
-          end
+          #if $input_buffer.empty? && stats_displayed == false
+          #  cmd_stats($player, nil)
+          #  stats_displayed = true
+          #end
 
-          show_prompt("Is this acceptable (yes/no)?")
+          show_prompt("Is this acceptable (y/n)?")
           choice = get_input
           unless choice.nil?
             $win.addstr("\n\n")
-            if choice =~ /n/i
+            if choice =~ /\An\Z/i
               $player.roll_stats
-            elsif choice =~ /y/i
+              cmd_stats($player, nil)
+            elsif choice =~ /\Ay\Z/i
               cmd_look($player, nil)
 
               $win.timeout = 100
               $player.state = :PLAYING
+            else
+              cmd_stats($player, nil)
             end
           end
 
         when :PLAYING
           if time % 20 == 0
+            time = 0
             # do world stuff
           end
 

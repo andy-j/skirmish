@@ -69,11 +69,17 @@ end
 
 def setup_screen
   Curses.init_screen
+  Curses.start_color
   Curses.cbreak
   Curses.noecho
   Curses.nl
 
+  Curses.init_pair(1, Curses::COLOR_GREEN, Curses::COLOR_BLACK)
+  Curses.init_pair(2, Curses::COLOR_CYAN, Curses::COLOR_BLACK)
+  Curses.init_pair(3, Curses::COLOR_WHITE, Curses::COLOR_BLACK)
+
   $win = Curses::Window.new(0, 0, 0, 0)
+  $win.color_set(1)
   $win.scrollok true
   $win.idlok true
   $win.keypad = true
@@ -103,23 +109,28 @@ def handle_input(input)
 end
 
 def show_prompt(prompt=">")
+  $win.color_set(3)
   $win.setpos($win.cury, 0)
   $win.deleteln
   $win.addstr(prompt + " " + $input_buffer.join)
+  $win.color_set(1)
 end
 
-# receive input from user with optional string as prompt
-def prompt_user(prompt=">")
-  $win.addstr(prompt + " ")
-  input = $win.getstr
+def print_line(line = "", color = :green)
+  case color
+  when :green
+    $win.color_set(1)
+  when :cyan
+    $win.color_set(2)
+  when :white
+    $win.color_set(3)
+  end
 
-  return input
-end
-
-def print_line(line = "")
   $win.setpos($win.cury, 0)
   $win.deleteln
   $win.addstr(line + "\n")
+
+  $win.color_set(1)
 end
 
 def roll_dice(number_of_dice, size_of_dice)

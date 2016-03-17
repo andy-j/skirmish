@@ -15,15 +15,15 @@ def cmd_move_character(character, direction)
 	)
   unless new_location.nil?
     character.location = new_location
-    cmd_look(character, nil)
+    cmd_look character, nil
   else
-    print_line("You can't go that way!\n")
+    print_line "You can't go that way!\n"
   end
 end
 
 # list the available exits from the room the player is currently in
 def cmd_list_exits(character, input)
-  exits = $world.get_exits(character.location)
+  exits = $world.get_exits character.location
 
   exits_list = "[ Exits: "
   until exits.empty? do
@@ -31,23 +31,22 @@ def cmd_list_exits(character, input)
   end
   exits_list << "]\n"
 
-  print_line(exits_list)
+  print_line exits_list, :cyan
 end
 
 # list the commands available to the player
 def cmd_list_commands(character, input)
   commands = $commands.keys
 
-  print_line(commands.join(" "))
+  print_line commands.join(" ")
   print_line
-
 end
 
 # display room name and description to character
 def cmd_look(character, keyword)
-  print_line($world.get_room_name(character.location))
-  print_line($world.get_room_description(character.location))
-  cmd_list_exits(character, nil)
+  print_line $world.get_room_name(character.location), :cyan
+  print_line $world.get_room_description(character.location)
+  cmd_list_exits character, nil
 end
 
 # show player's statistics
@@ -74,11 +73,11 @@ end
 # quit! maybe save something sometime in the future?
 def cmd_quit(character, input)
   unless input =~ /quit/i
-    print_line("You must type the entire word 'quit' to quit.\n")
+    print_line "You must type the entire word 'quit' to quit.\n"
   else
-    print_line("Until next time...")
+    print_line "Until next time..."
     $win.refresh
-    sleep(3)
+    sleep 3
     $win.close
     exit
   end
