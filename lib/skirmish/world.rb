@@ -63,9 +63,8 @@ class World
   def get_exits(room_number)
     directions = %w[North East South West Up Down]
     exits = Array.new
-
-    6.times { |i| exits.push(directions[i]) if @rooms.key?(@rooms[room_number].direction_data[i]) }
-
+    6.times { |i| exits.push(directions[i]) if @rooms.key?(@rooms[room_number].direction_data[i])}
+    
     exits
   end
 
