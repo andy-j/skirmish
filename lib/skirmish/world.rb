@@ -62,6 +62,17 @@ class World
     @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
   end
 
+  def get_room_characters(room_number)
+    return @rooms[room_number].characters
+  end
+
+  def move_character(character, original_location, new_location)
+    if @rooms.key?(original_location)
+      @rooms[original_location].characters.delete(character)
+    end
+    @rooms[new_location].characters.push character
+  end
+
   def get_exits(room_number)
     directions = ["n", "e", "s", "w", "u", "d"]
     exits = Array.new
@@ -89,6 +100,7 @@ class Room
 
   def initialize
     @direction_data = Hash.new
+    @characters = Array.new
   end
 
 end

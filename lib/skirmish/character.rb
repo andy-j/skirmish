@@ -9,6 +9,7 @@ class Character
 
     roll_stats initial_level
     @location = initial_location
+    $world.move_character(self, 0, initial_location)
   end
 
   def roll_stats(initial_level = 1)
@@ -44,13 +45,13 @@ class Character
 end
 
 class Player < Character
-  def initialize
-    super()
+  def initialize(name="", initial_level=1, initial_location=3001)
+    super(name, initial_level, initial_location)
   end
 end
 
 class Mobile < Character
-  def initialize
-    super()
+  def initialize(name="", initial_level=1, initial_location=3001)
+    super(name, initial_level, initial_location)
   end
 end

@@ -14,10 +14,15 @@ def cmd_move_character(character, direction)
 	end
 	)
   unless new_location.nil?
+    $world.move_character character, character.location, new_location
     character.location = new_location
-    cmd_look character, nil
+    if character.is_a?(Player)
+      cmd_look character, nil
+    end
   else
-    print_line "You can't go that way!\n"
+    if character.is_a?(Player)
+      print_line "You can't go that way!\n"
+    end
   end
 end
 
@@ -46,6 +51,11 @@ end
 def cmd_look(character, keyword)
   print_line $world.get_room_name(character.location), :cyan
   print_line $world.get_room_description(character.location)
+  $world.get_room_characters(character.location).each do | char |
+    unless char.name == character.name
+      print_line char.name + " is standing here.", :white
+    end
+  end
   cmd_list_exits character, nil
 end
 

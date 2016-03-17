@@ -11,6 +11,9 @@ class Skirmish
     $player = Player.new
     $input_buffer = Array.new
     $command_history = Command_History.new
+
+    @mobile = Mobile.new("Bob", 1, 3014)
+
     setup_screen
     time = 0
     stats_displayed = false
