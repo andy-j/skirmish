@@ -54,6 +54,15 @@ def get_input
       end
       return nil
 
+    when 9  # tab
+      possible_commands = $commands.select { |c| c =~ /\A#{Regexp.escape($input_buffer.join)}/i }
+      # TODO: look for a space in the buffer instead of this horribe hack.
+      unless possible_commands.nil? or possible_commands.first.nil?
+        $input_buffer.clear
+        possible_commands.first.first.each_char { |chr|  $input_buffer.push chr }
+      end
+      return nil
+
     when 10 || 13   # KEY_ENTER is numpad enter - this matches \n or \r
       input = $input_buffer.join
       $input_buffer.clear
