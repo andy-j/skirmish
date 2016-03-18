@@ -1,17 +1,20 @@
 require "colorize"
 require_relative "utilities"
 require_relative "creature"
-class Character < Creature
-  	attr_reader :name, :height, :weight, :level
+class Player < Creature
+  	attr_reader :height, :weight, :level
 	attr_writer :xp
-  	attr_accessor :armour, :state, :location
+  	attr_accessor :armour, :state, :location, :name
   	# Create the character, which by default begins at level one
- 	def initialize(name="", initial_level=1, inital_location=3001) # Create the character, which by default begins at level one
+ 	def initialize(name="", initial_level=1, inital_location=3001, description="you're..you!", keywords=["self"]) # Create the player, which by default begins at level one
     		@name     = name
 		@state    = :CREATING
 		@level    = initial_level
+		@description = description
 		@location = initial_location
-		
+		$world.move_character self, 0, @location
+		@quest = nil
+
 		stats = Hash.new {|hash, key| hash[key] = Utilities.roll_dice(3, 6)}
 		%i(strength constitution charisma wisdom intelligence).each { |stat| stats[stat] }
     		size_roll = Utilities::roll_dice 2, 10
@@ -63,4 +66,11 @@ class Character < Creature
                 @stats.each_key {|key| @stats[key] = (@base_stats.fetch(key) * level / @stat_modifiers[key]).ceil}
         end 	
                         
+end
+class Mobile < Player
+  attr_reader :description, :keywords
+
+  def initialize(name="", initial_level=1, initial_location=3001, description="", keywords=Array.new)
+    super(name, initial_level, initial_location, description, keywords)
+  end
 end

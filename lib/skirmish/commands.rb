@@ -1,4 +1,5 @@
 require_relative "utilities"
+require_relative "player"
 # Implementation of player commands. Each command must accept two arguments - a
 # character object and the original input string.
 module Commands
@@ -16,22 +17,21 @@ module Commands
  				when /\Ad/i then 5
 			end
   		)
-  		unless new_location.nil?
-    			character.location = new_location
-    			look character
-  		else
-    			print_line "You can't go that way!".colorize(:red)
-  		end
-	end
+  	  	unless new_location.nil?
+    			$world.move_character character, character.location, new_location
+   			character.location = new_location
+    			look character if character.is_a? Player
+  		else print_line "You can't go that way!\n" if character.is_a? Player end
+  	end
 	# list the available exits from the room the player is currently in
-	def list_exits(character, input=nil)
+	def list_exits(character, input="")
   		exits = $world.get_exits(character.location)
 
 		exits_list = "[ Exits: "
 		exits_list << exits.shift.to_s << ?\s until exits.empty?
 		exits_list << "]\n"
   
-		print_line exits_list
+		print_line exits_list, :cyan
 	end
 
 	# list the commands available to the player
@@ -43,11 +43,22 @@ module Commands
 	end
 
 	# display room name and description to character
-	def look(character, keyword=nil)
-  		print_line $world.get_room_name(character.location)
-  		print_line $world.get_room_description(character.location)
-  		list_exits character
-	end
+  	def look(player, input="")
+    		look_at = input.split[1..-1]
+		unless look_at.nil? || look_at.first.nil?
+    			matches = $world.get_room_characters(player.location).select { |c| c.keywords =~ /\A#{Regexp.escape(look_at.first)}/i }
+    			unless matches.first.nil?
+      				print_line matches.first.description + "\n"
+    			else
+      				print_line "There is nothing to look at with that name.\n"
+    			end
+  		else
+    			print_line $world.get_room_name(player.location), :cyan
+    			print_line $world.get_room_description(player.location)
+    			$world.get_room_characters(player.location).each {|char| print_line "#{char.name} is standing here.", :white unless char.name == player.name}
+    		end
+    		list_exits player
+  	end
 	# show player's statistics
 	def stats(character, input=nil)
 
@@ -68,15 +79,15 @@ module Commands
 	end
 
 	# quit! maybe save something sometime in the future?
-	def quit(character, input)
+	def quit(player, input)
   		unless input =~ /quit/i
-    			print_line "You must type the entire word 'quit' to quit."
-  		else
-			if prompt_user("Are you sure you want to exit?") =~ /\Ay/i
-    				print_line "Until next time...\n".colorize(:green)
-    				$win.close
-				exit
-			end
+    			print_line "You must type the entire word 'quit' to quit.\n"
+ 	 	else
+    			print_line "Until next time..."
+    			$win.refresh
+    			sleep 3
+    			$win.close
+    			exit
   		end
 	end
 	COMMANDS = {	north: Commands.method(:move_character),

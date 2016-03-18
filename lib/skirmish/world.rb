@@ -1,12 +1,15 @@
 # The following classes represent the world of the game -
 
 class World
-  @rooms
-  @characters
 
   def initialize(world_file)
     @rooms = Hash.new
     @characters = Array.new
+    @names = Array.new
+
+    f = File.open("lib/mobiles/names") or die "Unable to open 'names' file."
+    f.each_line {|name| @names.push name}
+    f.close
 
     file = File.read(world_file).split(/^\#/).drop(1).each do |chunk|
       room = chunk.split /\r?\n|\r/
@@ -40,7 +43,6 @@ class World
         end
       end
       @rooms[room_number] = new_room
-      #puts line
     end
   end
 
@@ -58,6 +60,17 @@ class World
   # specified direction, return the number of the destination room
   def get_destination(room_number, direction)
     @rooms.key?(room_number) && @rooms.key?(@rooms[room_number].direction_data[direction]) ? @rooms[room_number].direction_data[direction] : nil
+  end
+
+  def get_room_characters(room_number)
+    return @rooms[room_number].characters
+  end
+
+  def move_character(character, original_location, new_location)
+    if @rooms.key?(original_location)
+      @rooms[original_location].characters.delete(character)
+    end
+    @rooms[new_location].characters.push character
   end
 
   def get_exits(room_number)
@@ -82,6 +95,7 @@ class Room
 
   def initialize
     @direction_data = Hash.new
+    @characters = Array.new
   end
 
 end
