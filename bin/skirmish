@@ -1,4 +1,11 @@
 #!/usr/bin/env ruby
 
+# skirmish is a single-player game in the style of CircleMUD.
+# This script runs the game.
+#
+# Author::    Andy Mikula  (mailto:andy@andymikula.ca)
+# Copyright:: Copyright (c) 2016 Andy Mikula
+# License::   MIT
+
 require_relative '../lib/skirmish'
 Skirmish.play

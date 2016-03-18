@@ -1,19 +1,25 @@
+# skirmish is a single-player game in the style of CircleMUD.
+# This file holds the Character class, as well as the Player and Mobile
+# subclasses.
+#
+# Author::    Andy Mikula  (mailto:andy@andymikula.ca)
+# Coauthor::  Zachary Perlmutter  (mailto:zrp200@gmail.com)
+# Copyright:: Copyright (c) 2016 Andy Mikula
+# License::   MIT
 require "colorize"
 require_relative "utilities"
 require_relative "creature"
-class Player < Creature
+class Character < Creature
   	attr_reader :height, :weight, :level
 	attr_writer :xp
   	attr_accessor :armour, :state, :location, :name
   	# Create the character, which by default begins at level one
- 	def initialize(name="", initial_level=1, inital_location=3001, description="you're..you!", keywords=["self"]) # Create the player, which by default begins at level one
+ 	def initialize(name="", initial_level=1, inital_location=3001) # Create the player, which by default begins at level one
     		@name     = name
 		@state    = :CREATING
 		@level    = initial_level
-		@description = description
 		@location = initial_location
 		$world.move_character self, 0, @location
-		@quest = nil
 
 		stats = Hash.new {|hash, key| hash[key] = Utilities.roll_dice(3, 6)}
 		%i(strength constitution charisma wisdom intelligence).each { |stat| stats[stat] }
@@ -67,10 +73,25 @@ class Player < Creature
         end 	
                         
 end
-class Mobile < Player
+class Player < Character
+	def initialize(name="", initial_level=1)
+		@quest = nil
+		@created_time = Time.now.freeze
+		super
+	end
+	def time_since_creation
+		Time.now - @created_time
+	end
+end
+# A 'Mobile' is any non-player character in the game
+# TODO: Write 'act' method for Mobile to be called on game ticks (or some
+# multiple thereof)
+class Mobile < Character
   attr_reader :description, :keywords
 
   def initialize(name="", initial_level=1, initial_location=3001, description="", keywords=Array.new)
-    super(name, initial_level, initial_location, description, keywords)
+    	@description = description
+	@keywords = keywords
+	super(name, initial_level, initial_location)
   end
 end
