@@ -1,11 +1,13 @@
 class Character
   attr_accessor :name, :height, :weight, :str, :dex, :con, :int, :wis, :cha,
-    :maxhp, :hp, :xp, :armour, :level, :state, :location
+    :maxhp, :hp, :xp, :armour, :level, :state, :location, :description, :keywords
 
   # Create the character, which by default begins at level one
-  def initialize(name="", initial_level=1, initial_location=3001)
+  def initialize(name="", initial_level=1, initial_location=3001, description="", keywords=Array.new)
     @state = :CREATING
     @name = name
+    @description = description
+    @keywords = keywords
 
     roll_stats initial_level
     @location = initial_location
@@ -45,13 +47,16 @@ class Character
 end
 
 class Player < Character
-  def initialize(name="", initial_level=1, initial_location=3001)
-    super(name, initial_level, initial_location)
+  def initialize(name="", initial_level=1, initial_location=3001, description="You're...you!", keywords="self")
+    super(name, initial_level, initial_location, description, keywords)
+    @quest = nil
   end
 end
 
 class Mobile < Character
-  def initialize(name="", initial_level=1, initial_location=3001)
-    super(name, initial_level, initial_location)
+  attr_reader :description, :keywords
+
+  def initialize(name="", initial_level=1, initial_location=3001, description="", keywords=Array.new)
+    super(name, initial_level, initial_location, description, keywords)
   end
 end

@@ -12,7 +12,7 @@ class Skirmish
     $input_buffer = Array.new
     $command_history = Command_History.new
 
-    @mobile = Mobile.new("Bob", 1, 3014)
+    @mobile = Mobile.new("Bob", 1, 3014, "Bob is a character, just like you!", "bob")
 
     setup_screen
     time = 0
@@ -36,12 +36,6 @@ class Skirmish
           end
 
         when :ROLLING
-          # TODO: if the player begins typing and backspaces to the beginning of
-          # the line, this will re-print the stats readout - not ideal.
-          #if $input_buffer.empty? && stats_displayed == false
-          #  cmd_stats($player, nil)
-          #  stats_displayed = true
-          #end
 
           show_prompt("Is this acceptable (y/n)?")
           choice = get_input
@@ -51,7 +45,7 @@ class Skirmish
               $player.roll_stats
               cmd_stats($player, nil)
             elsif choice =~ /\Ay\Z/i
-              cmd_look($player, nil)
+              cmd_look($player, "")
 
               $win.timeout = 100
               $player.state = :PLAYING

@@ -13,7 +13,7 @@ class Command_History
 
   def get_last
     unless @position == 0
-      last_command = @history[@position].split
+      last_command = @history[@position].split(/(\W)/)
       @position -= 1
       return last_command
     else
@@ -23,8 +23,8 @@ class Command_History
 
   def get_next
     unless @position == @history.length - 1
-      @position += 1
-      next_command = @history[@position].split
+      @position += 2
+      next_command = @history[@position].split(/(\W)/)
       return next_command
     else
       return nil
@@ -41,22 +41,22 @@ def get_input
     when Curses::KEY_UP
       last_command = $command_history.get_last
       unless last_command.nil?
-        $input_buffer = Array.new
-        last_command.each { |chr|  $input_buffer.push chr }
+        $input_buffer.clear
+        last_command.join.each_char { |chr|  $input_buffer.push chr }
       end
       return nil
 
     when Curses::KEY_DOWN
       next_command = $command_history.get_next
       unless next_command.nil?
-        $input_buffer = Array.new
-        next_command.each { |chr|  $input_buffer.push chr }
+        $input_buffer.clear
+        next_command.join.each_char { |chr|  $input_buffer.push chr }
       end
       return nil
 
     when 10 || 13   # KEY_ENTER is numpad enter - this matches \n or \r
       input = $input_buffer.join
-      $input_buffer = Array.new
+      $input_buffer.clear
       $command_history.add_command input
       return input
 

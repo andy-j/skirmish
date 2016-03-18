@@ -17,7 +17,7 @@ def cmd_move_character(character, direction)
     $world.move_character character, character.location, new_location
     character.location = new_location
     if character.is_a?(Player)
-      cmd_look character, nil
+      cmd_look character, ""
     end
   else
     if character.is_a?(Player)
@@ -27,8 +27,8 @@ def cmd_move_character(character, direction)
 end
 
 # list the available exits from the room the player is currently in
-def cmd_list_exits(character, input)
-  exits = $world.get_exits character.location
+def cmd_list_exits(player, input)
+  exits = $world.get_exits player.location
 
   exits_list = "[ Exits: "
   until exits.empty? do
@@ -40,48 +40,61 @@ def cmd_list_exits(character, input)
 end
 
 # list the commands available to the player
-def cmd_list_commands(character, input)
+def cmd_list_commands(player, input)
   commands = $commands.keys
 
   print_line commands.join(" ")
   print_line
 end
 
-# display room name and description to character
-def cmd_look(character, keyword)
-  print_line $world.get_room_name(character.location), :cyan
-  print_line $world.get_room_description(character.location)
-  $world.get_room_characters(character.location).each do | char |
-    unless char.name == character.name
-      print_line char.name + " is standing here.", :white
+# display room name and description to the player
+def cmd_look(player, input)
+
+    look_at = input.split[1..-1]
+
+  unless look_at.nil? || look_at.first.nil?
+    matches = $world.get_room_characters(player.location)
+              .select { |c| c.keywords =~ /\A#{Regexp.escape(look_at.first)}/i }
+    unless matches.first.nil?
+      print_line matches.first.description + "\n"
+    else
+      print_line "There is nothing to look at with that name.\n"
     end
+  else
+    print_line $world.get_room_name(player.location), :cyan
+    print_line $world.get_room_description(player.location)
+    $world.get_room_characters(player.location).each do | char |
+      unless char.name == player.name
+        print_line char.name + " is standing here.", :white
+      end
+    end
+    cmd_list_exits player, nil
   end
-  cmd_list_exits character, nil
 end
 
 # show player's statistics
-def cmd_stats(character, input)
+def cmd_stats(player, input)
 
-  feet = character.height / 12
-  inches = character.height % 12
+  feet = player.height / 12
+  inches = player.height % 12
 
   print_line("Your name is %s. You are %d'%d\" tall and you weigh %d lbs." %
-  [character.name, feet, inches, character.weight])
+  [player.name, feet, inches, player.weight])
   print_line("You are level %d and have %d experience points." %
-  [character.level, character.xp])
+  [player.level, player.xp])
   print_line("============================================================")
-  print_line("Hitpoints:   %6d / %d" % [character.hp, character.maxhp])
-  print_line("Attack:      %6d - %2d" % [character.level, character.level * 10])
-  print_line("Armour:           %6d" % character.armour)
+  print_line("Hitpoints:   %6d / %d" % [player.hp, player.maxhp])
+  print_line("Attack:      %6d - %2d" % [player.level, player.level * 10])
+  print_line("Armour:           %6d" % player.armour)
   print_line("============================================================")
-  print_line("Strength:    %6d                     Charisma:    %6d" % [character.str, character.cha])
-  print_line("Constitution:%6d                     Wisdom:      %6d" % [character.con, character.wis])
-  print_line("Dexterity:   %6d                     Intelligence:%6d" % [character.dex, character.int])
+  print_line("Strength:    %6d                     Charisma:    %6d" % [player.str, player.cha])
+  print_line("Constitution:%6d                     Wisdom:      %6d" % [player.con, player.wis])
+  print_line("Dexterity:   %6d                     Intelligence:%6d" % [player.dex, player.int])
   print_line
 end
 
 # quit! maybe save something sometime in the future?
-def cmd_quit(character, input)
+def cmd_quit(player, input)
   unless input =~ /quit/i
     print_line "You must type the entire word 'quit' to quit.\n"
   else
