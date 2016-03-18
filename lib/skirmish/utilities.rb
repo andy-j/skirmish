@@ -23,7 +23,7 @@ class Command_History
 
   def get_next
     unless @position == @history.length - 1
-      @position += 2
+      @position += 1
       next_command = @history[@position].split(/(\W)/)
       return next_command
     else
