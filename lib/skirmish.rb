@@ -9,10 +9,12 @@ require 'curses'
 require_relative 'skirmish/world'
 require_relative 'skirmish/utilities'
 require_relative 'skirmish/commands'
-require_relative 'skirmish/character'
+require_relative 'skirmish/player'
+require_relative 'skirmish/creature'
+#require_relative 'skirmish/battle'
 
 class Skirmish
-
+  include Curses, Utilities
   # Set up the world and run the game loop
   # TODO: Load the player / world state from a save file
   def self.play
@@ -38,14 +40,14 @@ class Skirmish
         # Player is entering their name
         # TODO: Ask for confirmation on the name before continuing on.
         when :CREATING
-          show_prompt("Welcome! What is your name?")
+          show_prompt "Welcome! What is your name? "
           name = get_input
 
           # TODO: Adding two newlines here is ugly.
           unless name.nil?
             $win.addstr("\n\n")
             $player.name = name
-            cmd_stats($player, nil)
+            Commands::stats $player
             $player.state = :ROLLING
           end
 
@@ -57,18 +59,17 @@ class Skirmish
             $win.addstr("\n\n")
             if choice =~ /\An\Z/i
               $player.roll_stats
-              cmd_stats($player, nil)
+              Commands::stats $player
             elsif choice =~ /\Ay\Z/i
               # Stats OK - set timeout for getch and show the player where
               # they are in the world
               $win.timeout = 100
               $player.state = :PLAYING
-              cmd_look($player, "")
+              Commands::look $player, ""
             else
-              cmd_stats($player, nil)
+              Commands::stats $player
             end
           end
-
         # Player is in the game, walking around
         when :PLAYING
           # TODO: Pick a reasonable length of time for a 'tick'
@@ -76,13 +77,16 @@ class Skirmish
             time = 0
             # Tick! Do world stuff
           end
-
-          show_prompt(">")
-          handle_input(get_input)
+          show_prompt ?>
+          handle_input get_input
+          # do world stuff
 
         # Player is engaged in a fight
         when :FIGHTING
-          # Nothing yet...
+=begin
+        	Battle.start(opponent)
+		Battle.duel
+=end
       end
     end
   end
